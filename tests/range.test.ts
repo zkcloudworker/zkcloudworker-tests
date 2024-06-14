@@ -1,9 +1,9 @@
 import { describe, expect, it } from "@jest/globals";
-import { Field, Gadgets, Encoding } from "o1js";
+import { Field, Gadgets, Encoding, UInt64, Provable } from "o1js";
 import { makeString } from "zkcloudworker";
 
 describe("Range check", () => {
-  it(`should get range`, async () => {
+  it.skip(`should get range`, async () => {
     let maxValue: bigint = 1n;
     let oldBits = 0;
     for (let i = 1; i < 33; i++) {
@@ -19,7 +19,45 @@ describe("Range check", () => {
       oldBits = bits;
     }
   });
+  it(`should check formula`, async () => {
+    for (let j = 0; j < 100000; j++) {
+      const name = makeString(Math.floor(Math.random() * 29) + 1);
+      const fields = Encoding.stringToFields(name);
+      if (fields.length !== 1)
+        throw new Error(`Invalid name ${name} ${fields.length} ${name.length}`);
+      const priceField = fieldPrice(fields[0]);
+      const priceMina = price(name);
+      if (
+        priceField
+          .equals(UInt64.from(BigInt(priceMina) * 1_000_000_000n))
+          .toBoolean() === false
+      )
+        throw new Error(
+          `Invalid price ${name} ${priceField.toJSON()} ${priceMina}`
+        );
+      if (j < 10) console.log(`${name} ${priceField.toJSON()} ${priceMina}`);
+    }
+  });
 });
+
+function price(name: string): number {
+  if (name.length > 5) return 10;
+  if (name.length <= 3) return 99;
+  return 19;
+}
+
+function fieldPrice(name: Field): UInt64 {
+  const price: UInt64 = Provable.if(
+    name.greaterThan(Field(BigInt(2 ** 43))),
+    UInt64.from(10_000_000_000n),
+    Provable.if(
+      name.lessThan(Field(BigInt(2 ** 27))),
+      UInt64.from(99_000_000_000n),
+      UInt64.from(19_000_000_000n)
+    )
+  );
+  return price;
+}
 
 /*
 [1:16:01 PM] 1 512

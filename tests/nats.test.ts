@@ -2,7 +2,7 @@ import { describe, expect, it } from "@jest/globals";
 import { connect } from "nats";
 import { sleep } from "zkcloudworker";
 
-const endpoint = "http://cloud.zkcloudworker.com:4222";
+const endpoint = "https://cloud.zkcloudworker.com:4222";
 
 describe("nats", () => {
   it.skip(`should use nats`, async () => {
@@ -51,13 +51,16 @@ describe("nats", () => {
     const js = nc.jetstream();
     const kv = await js.views.kv("profiles");
 
-    let jobStatus = "";
+    let revision = 0;
     while (true) {
-      const entry = await kv.get("zkcloudworker.jobStatus");
+      const entry = await kv.get(
+        "zkcloudworker.job.zkCWZRGuAakatqUZlzuhNDxgKVHNoxeSLVzeAHZQVcExHpw0"
+      );
       if (entry) {
         const job = JSON.parse(entry.string());
-        if (job.status !== jobStatus) console.log("job.status", { job });
-        jobStatus = job.status;
+        if (revision !== entry.revision)
+          console.log("job.status", { revision: entry.revision, job });
+        revision = entry.revision;
         if (entry.string() == "done") {
           break;
         }
@@ -66,7 +69,7 @@ describe("nats", () => {
     }
     await nc.drain();
   });
-  it(`should watch job status`, async () => {
+  it.skip(`should watch job status`, async () => {
     const nc = await connect({ servers: endpoint });
     const js = nc.jetstream();
     const kv = await js.views.kv("profiles");
@@ -74,22 +77,102 @@ describe("nats", () => {
     let jobStatus = "";
     let history = true;
     const iter = await kv.watch({
-      key: "zkcloudworker.jobStatus",
+      key: "zkcloudworker.job.staketab.nameservice",
+      //key: "zkcloudworker.job.DFST.worker-example",
       initializedFn: () => {
         history = false;
       },
     });
 
     for await (const e of iter) {
-      //Values marked with History are existing values -
-      // the watcher by default shows the last value for all the keys in the KV
-
+      const job = JSON.parse(e.string());
       console.log(
         `${history ? "History" : "Updated"} ${e.key} @ ${e.revision} -> `,
         JSON.parse(e.string())
       );
+      let historyJob = true;
+      const iterJob = await kv.watch({
+        key: `zkcloudworker.jobStatus.${job.jobId}`,
+        initializedFn: () => {
+          history = false;
+        },
+      });
+      for await (const e of iterJob) {
+        const jobStatus = JSON.parse(e.string());
+        console.log(
+          `${historyJob ? "History" : "Updated"} ${e.key} @ ${e.revision} -> `,
+          jobStatus
+        );
+        if (jobStatus.status === "finished" || jobStatus.status === "failed")
+          break;
+      }
     }
 
     await nc.drain();
   });
+
+  it(`should watch multiple jobs status`, async () => {
+    const jobKeys = [
+      "zkcloudworker.job.staketab.nameservice",
+      "zkcloudworker.job.DFST.worker-example",
+      // Add more job keys as needed
+    ];
+
+    await watchJobStatuses(endpoint, jobKeys).catch(console.error);
+  });
 });
+
+async function watchJobStatuses(endpoint: string, jobKeys: string[]) {
+  const nc = await connect({ servers: endpoint });
+  const js = nc.jetstream();
+  const kv = await js.views.kv("profiles");
+
+  // Function to watch the status of a single job
+  async function watchJobStatus(jobId: string) {
+    let historyJob = true;
+    const iterJob = await kv.watch({
+      key: `zkcloudworker.jobStatus.${jobId}`,
+      initializedFn: () => {
+        historyJob = false;
+      },
+    });
+
+    for await (const e of iterJob) {
+      const jobStatus = JSON.parse(e.string());
+      console.log(
+        `${historyJob ? "History" : "Updated"} ${e.key} @ ${e.revision} -> `,
+        jobStatus
+      );
+      if (jobStatus.status === "finished" || jobStatus.status === "failed") {
+        break;
+      }
+    }
+  }
+
+  // Function to watch multiple job statuses concurrently
+  async function watchMultipleJobs(key: string) {
+    let history = true;
+    const iter = await kv.watch({
+      key,
+      initializedFn: () => {
+        history = false;
+      },
+    });
+
+    for await (const e of iter) {
+      const job = JSON.parse(e.string());
+      console.log(
+        `${history ? "History" : "Updated"} ${e.key} @ ${e.revision} -> `,
+        job
+      );
+
+      // Start watching the jobStatus of the current job
+      watchJobStatus(job.jobId);
+    }
+  }
+
+  // Watch all jobs concurrently
+  await Promise.all(jobKeys.map((key) => watchMultipleJobs(key)));
+
+  await nc.drain();
+}

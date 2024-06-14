@@ -4,7 +4,7 @@ import { CELESTIA_AUTH_TOKEN } from "../env.json";
 import { Field, Gadgets } from "o1js";
 import crypto from "crypto";
 
-const endpoint = "http://cloud.zkcloudworker.com:26658";
+const endpoint = "https://cloud.zkcloudworker.com";
 //"http://34.252.140.110:26658";
 const fieldsData = [
   "6946470356961621595306082048105168006231226859093840185496755289268233254129",
