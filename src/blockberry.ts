@@ -1,5 +1,5 @@
 import { BLOCKBERRY_API } from "../env.json";
-import axios from "axios";
+
 
 export async function getTransactionFromBlockberry(params: {
   hash: string;

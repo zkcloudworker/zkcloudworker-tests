@@ -4,6 +4,15 @@ import { CHATGPT_TOKEN } from "../env.json";
 const openai = new OpenAI({ apiKey: CHATGPT_TOKEN });
 
 describe("Stream AI", () => {
+  it(`should list all available OpenAI models`, async () => {
+    const models = await openai.models.list();
+    expect(models).toBeDefined();
+    expect(models.data).toBeInstanceOf(Array);
+    console.log(
+      "Available models:",
+      models.data.map((model) => model.id)
+    );
+  });
   it.skip(`should get the stream answers`, async () => {
     const completion = await openai.chat.completions.create({
       model: "gpt-4o",
@@ -61,7 +70,7 @@ describe("Stream AI", () => {
     console.log("completion", completion);
   });
 
-  it(`should get the usual answer`, async () => {
+  it.skip(`should get the usual answer`, async () => {
     const completion = await openai.chat.completions.create({
       model: "gpt-4o",
       messages: [

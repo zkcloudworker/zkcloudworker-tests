@@ -1,6 +1,6 @@
 import { describe, expect, it } from "@jest/globals";
 import { accountBalanceMina, initBlockchain } from "zkcloudworker";
-import { PublicKey, Mina } from "o1js";
+import { PublicKey, Mina, checkZkappTransaction } from "o1js";
 
 const endpoint = "https://api.minascan.io/node/devnet/v1/graphql";
 // "https://proxy.devnet.minaexplorer.com/graphql"; //

@@ -3,6 +3,8 @@ env.json
 yarn-error.log
 node_modules/
 cache/
+cache-full/
+cache-minimal/
 .yarn/
 .pnp.cjs
 .pnp.loader.mjs

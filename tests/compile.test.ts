@@ -5,7 +5,7 @@ export class TestContract extends SmartContract {
   @state(Field) value = State<Field>();
 
   @method async setValue(value: Field) {
-    const timestamp = this.network.timestamp.getAndRequireEquals();
+    const slot = this.network.globalSlotSinceGenesis;
     this.value.set(value);
   }
 }
