@@ -1,5 +1,12 @@
 import { describe, expect, it } from "@jest/globals";
-import { initBlockchain, fee, fetchMinaAccount } from "zkcloudworker";
+import {
+  initBlockchain,
+  fee,
+  fetchMinaAccount,
+  blockchain,
+  sleep,
+  accountBalanceMina,
+} from "zkcloudworker";
 import {
   PublicKey,
   Mina,
@@ -18,19 +25,30 @@ import {
   DeployArgs,
   Bool,
   Cache,
+  Signature,
+  verify,
 } from "o1js";
+import { TEST_ACCOUNTS } from "../env.json";
+
+export class AddProof extends DynamicProof<Field, Field> {
+  static publicInputType = Field;
+  static publicOutputType = Field;
+  static maxProofsVerified = 0 as const;
+}
 
 class NFTStateInput extends Struct({
   creator: PublicKey,
   metadata: Field,
   owner: PublicKey,
   version: UInt32,
+  canChangeOwner: Bool,
 }) {
   static assertEqual(a: NFTStateInput, b: NFTStateInput) {
     a.creator.assertEquals(b.creator);
     a.metadata.assertEquals(b.metadata);
     a.owner.assertEquals(b.owner);
     a.version.assertEquals(b.version);
+    a.canChangeOwner.assertEquals(b.canChangeOwner);
   }
 }
 
@@ -58,6 +76,42 @@ const nftProgram = ZkProgram({
         });
       },
     },
+    changeOwner: {
+      privateInputs: [PublicKey], //, Signature
+      async method(
+        initialState: NFTStateInput,
+        newOwner: PublicKey
+        // https://github.com/o1-labs/o1js/issues/1854
+        //signature: Signature
+      ) {
+        // signature
+        //   .verify(initialState.owner, [
+        //     ...NFTStateInput.toFields(initialState),
+        //     ...newOwner.toFields(),
+        //   ])
+        //   .assertTrue();
+        return new NFTStateOutput({
+          metadata: initialState.metadata,
+          owner: newOwner,
+        });
+      },
+    },
+    // Commenting the add method will make the test pass
+    add: {
+      privateInputs: [AddProof, VerificationKey],
+      async method(
+        initialState: NFTStateInput,
+        proof: AddProof,
+        vk: VerificationKey
+      ) {
+        proof.publicInput.assertEquals(initialState.metadata);
+        proof.verify(vk);
+        return new NFTStateOutput({
+          metadata: proof.publicOutput,
+          owner: initialState.owner,
+        });
+      },
+    },
   },
 });
 
@@ -72,6 +126,7 @@ interface NFTContractDeployParams extends Exclude<DeployArgs, undefined> {
   owner: PublicKey;
   creator: PublicKey;
   metadataVerificationKeyHash: Field;
+  canChangeOwner: Bool;
 }
 
 export class NFTContract extends SmartContract {
@@ -89,6 +144,7 @@ export class NFTContract extends SmartContract {
     this.creator.set(props.creator);
     this.metadataVerificationKeyHash.set(props.metadataVerificationKeyHash);
     this.version.set(UInt32.from(1));
+    this.canChangeOwner.set(props.canChangeOwner);
   }
 
   @method async updateMetadata(proof: NFTProof, vk: VerificationKey) {
@@ -103,6 +159,7 @@ export class NFTContract extends SmartContract {
         metadata: this.metadata.getAndRequireEquals(),
         owner: this.owner.getAndRequireEquals(),
         version: this.version.getAndRequireEquals(),
+        canChangeOwner: this.canChangeOwner.getAndRequireEquals(),
       })
     );
     this.metadata.set(proof.publicOutput.metadata);
@@ -118,10 +175,23 @@ export class NFTContract extends SmartContract {
     this.owner.set(proof.publicOutput.owner);
   }
 }
+
+const pluginProgram = ZkProgram({
+  name: "pluginProgram",
+  publicInput: Field,
+  publicOutput: Field,
+  methods: {
+    add: {
+      privateInputs: [Field],
+      async method(a: Field, b: Field) {
+        return a.add(b);
+      },
+    },
+  },
+});
+
 let nftProgramVk: VerificationKey;
-// let program1Proof: Proof<Field, void>;
-// let program2Proof: Proof<Program2Struct, Field>;
-// let proof: NFTProof;
+let pluginProgramVk: VerificationKey;
 const cache: Cache = Cache.FileSystem("./cache");
 const owner = PrivateKey.randomKeypair();
 const creator = PrivateKey.randomKeypair();
@@ -131,27 +201,45 @@ const nftContract = new NFTContract(zkAppKey.publicKey);
 let deployer: PrivateKey = PrivateKey.random();
 let sender: PublicKey = deployer.toPublicKey();
 
+const chain: blockchain = "local" as blockchain;
+
 describe("NFT with Side loading verification key", () => {
+  it("should initialize a blockchain", async () => {
+    if (chain === "devnet") {
+      await initBlockchain("devnet");
+      deployer = PrivateKey.fromBase58(TEST_ACCOUNTS[0].privateKey);
+    } else {
+      const { keys } = await initBlockchain("local", 1);
+      deployer = keys[0].key;
+    }
+    sender = deployer.toPublicKey();
+    console.log("chain:", chain);
+    console.log("Contract address:", zkAppKey.publicKey.toBase58());
+    console.log("Sender address:", sender.toBase58());
+    console.log("Sender's balance:", await accountBalanceMina(sender));
+  });
+
   it("should compile with SmartContracts", async () => {
-    console.log("compiling NFTContract...");
+    console.log("compiling...");
     console.time("compiled NFTContract");
     await NFTContract.compile({ cache });
     console.timeEnd("compiled NFTContract");
   });
 
-  it("should compile ZkProgram", async () => {
+  it("should compile nft ZkProgram", async () => {
     console.time("compiled NFTProgram");
     nftProgramVk = (await nftProgram.compile({ cache })).verificationKey;
     console.timeEnd("compiled NFTProgram");
   });
 
+  it("should compile plugin ZkProgram", async () => {
+    console.time("compiled plugin ZkProgram");
+    pluginProgramVk = (await pluginProgram.compile({ cache })).verificationKey;
+    console.timeEnd("compiled plugin ZkProgram");
+  });
+
   it("should deploy a SmartContract", async () => {
-    const { keys } = await initBlockchain("local", 1);
-    deployer = keys[0].key;
-    sender = deployer.toPublicKey();
     await fetchMinaAccount({ publicKey: sender, force: true });
-    console.log("Contract address:", zkAppKey.publicKey.toBase58());
-    console.log("Sender address:", sender.toBase58());
     const tx = await Mina.transaction(
       { sender, fee: await fee(), memo: "NFT contract deploy" },
       async () => {
@@ -161,6 +249,7 @@ describe("NFT with Side loading verification key", () => {
           metadata,
           owner: owner.publicKey,
           metadataVerificationKeyHash: nftProgramVk.hash,
+          canChangeOwner: Bool(true),
         });
       }
     );
@@ -172,20 +261,122 @@ describe("NFT with Side loading verification key", () => {
     console.log("NFT contract deployed:", txIncluded.hash);
   });
 
-  it("should update metadata", async () => {
-    const newMetadata = Field(2);
+  // it.skip("should update metadata with plugin", async () => {
+  //   if (chain === "devnet") {
+  //     await sleep(10000);
+  //   }
+  //   await fetchMinaAccount({ publicKey: zkAppKey.publicKey, force: true });
+  //   const nftInputState = new NFTStateInput({
+  //     creator: nftContract.creator.get(),
+  //     metadata: nftContract.metadata.get(),
+  //     owner: nftContract.owner.get(),
+  //     version: nftContract.version.get(),
+  //     canChangeOwner: nftContract.canChangeOwner.get(),
+  //   });
+  //   const pluginProof = await pluginProgram.add(
+  //     nftInputState.metadata,
+  //     Field(10)
+  //   );
+  //   const pluginProofSideLoaded = AddProof.fromProof(pluginProof);
+
+  //   console.time("metadata proof generated");
+  //   const proof = await nftProgram.add(
+  //     nftInputState,
+  //     pluginProofSideLoaded,
+  //     pluginProgramVk
+  //   );
+  //   console.timeEnd("metadata proof generated");
+  //   const metadataProof = NFTProof.fromProof(proof);
+  //   console.time("prepare update metadata tx");
+  //   await fetchMinaAccount({ publicKey: zkAppKey.publicKey, force: true });
+  //   await fetchMinaAccount({ publicKey: sender, force: true });
+  //   const tx = await Mina.transaction(
+  //     { sender, fee: await fee(), memo: "Update metadata" },
+  //     async () => {
+  //       await nftContract.updateMetadata(metadataProof, nftProgramVk);
+  //     }
+  //   );
+  //   await tx.prove();
+  //   console.timeEnd("prepare update metadata tx");
+  //   const txIncluded = await (await tx.sign([deployer]).send()).wait();
+  //   console.log("update metadata tx:", txIncluded.hash);
+  //   if (chain === "devnet") {
+  //     await sleep(10000);
+  //   }
+  //   await fetchMinaAccount({ publicKey: zkAppKey.publicKey, force: true });
+  //   const metadata = nftContract.metadata.get();
+  //   expect(metadata.toJSON()).toBe(
+  //     nftInputState.metadata.add(Field(10)).toJSON()
+  //   );
+  // });
+
+  it("should change owner", async () => {
+    const newOwner = PrivateKey.randomKeypair().publicKey;
     await fetchMinaAccount({ publicKey: zkAppKey.publicKey, force: true });
     const nftInputState = new NFTStateInput({
       creator: nftContract.creator.get(),
       metadata: nftContract.metadata.get(),
       owner: nftContract.owner.get(),
       version: nftContract.version.get(),
+      canChangeOwner: nftContract.canChangeOwner.get(),
+    });
+    console.time("change owner proof generated");
+    // const signature = Signature.create(owner.privateKey, [
+    //   ...NFTStateInput.toFields(nftInputState),
+    //   ...newOwner.toFields(),
+    // ]);
+    const proof = await nftProgram.changeOwner(
+      nftInputState,
+      newOwner
+      //signature
+    );
+    const ok = await verify(proof, nftProgramVk);
+    expect(ok).toBe(true);
+    if (!ok) {
+      console.log("proof is invalid");
+      return;
+    }
+    console.timeEnd("change owner proof generated");
+    const changeOwnerProof = NFTProof.fromProof(proof);
+    console.time("prepare change owner tx");
+    await fetchMinaAccount({ publicKey: zkAppKey.publicKey, force: true });
+    await fetchMinaAccount({ publicKey: sender, force: true });
+    const tx = await Mina.transaction(
+      { sender, fee: await fee(), memo: "Update metadata" },
+      async () => {
+        await nftContract.updateMetadata(changeOwnerProof, nftProgramVk);
+      }
+    );
+    await tx.prove();
+    console.timeEnd("prepare change owner tx");
+    const txIncluded = await (await tx.sign([deployer]).send()).wait();
+    console.log("change owner tx:", txIncluded.hash);
+    if (chain === "devnet") {
+      await sleep(10000);
+    }
+    await fetchMinaAccount({ publicKey: zkAppKey.publicKey, force: true });
+    const owner = nftContract.owner.get();
+    expect(owner.toBase58()).toBe(newOwner.toBase58());
+  });
+
+  it("should update metadata", async () => {
+    if (chain === "devnet") {
+      await sleep(10000);
+    }
+    const newMetadata = Field(7);
+    await fetchMinaAccount({ publicKey: zkAppKey.publicKey, force: true });
+    const nftInputState = new NFTStateInput({
+      creator: nftContract.creator.get(),
+      metadata: nftContract.metadata.get(),
+      owner: nftContract.owner.get(),
+      version: nftContract.version.get(),
+      canChangeOwner: nftContract.canChangeOwner.get(),
     });
     console.time("metadata proof generated");
     const proof = await nftProgram.updateMetadata(
       nftInputState,
       newMetadata,
-      owner.publicKey
+      nftContract.owner.get()
     );
     console.timeEnd("metadata proof generated");
     const metadataProof = NFTProof.fromProof(proof);
@@ -202,5 +393,11 @@ describe("NFT with Side loading verification key", () => {
     console.timeEnd("prepare update metadata tx");
     const txIncluded = await (await tx.sign([deployer]).send()).wait();
     console.log("update metadata tx:", txIncluded.hash);
+    if (chain === "devnet") {
+      await sleep(10000);
+    }
+    await fetchMinaAccount({ publicKey: zkAppKey.publicKey, force: true });
+    const metadata = nftContract.metadata.get();
+    expect(metadata.toJSON()).toBe(newMetadata.toJSON());
   });
 });

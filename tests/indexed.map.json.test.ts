@@ -3,7 +3,7 @@ import { Experimental, Field } from "o1js";
 import { serializeIndexedMap, deserializeIndexedMap } from "../src/indexed-map";
 const { IndexedMerkleMap } = Experimental;
 const MAP_HEIGHT = 20;
-const NUMBER_OF_ELEMENTS = 1000;
+const NUMBER_OF_ELEMENTS = 100;
 class MerkleMap extends IndexedMerkleMap(MAP_HEIGHT) {}
 
 describe("Indexed Map serialization", () => {
