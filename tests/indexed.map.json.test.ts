@@ -1,14 +1,13 @@
 import { describe, expect, it } from "@jest/globals";
 import { Experimental, Field } from "o1js";
-import { bigintToBase64, bigintFromBase64 } from "zkcloudworker";
 import { serializeIndexedMap, deserializeIndexedMap } from "../src/indexed-map";
-import assert from "assert";
 const { IndexedMerkleMap } = Experimental;
-const MAP_HEIGHT = 11;
+const MAP_HEIGHT = 20;
+const NUMBER_OF_ELEMENTS = 100;
 class MerkleMap extends IndexedMerkleMap(MAP_HEIGHT) {}
 
-describe("Indexed Map", () => {
-  it(`should create a map`, async () => {
+describe("Indexed Map serialization", () => {
+  it(`should test a serialization and deserialization`, async () => {
     const map = new MerkleMap();
     map.set(1n, 2n);
     map.set(2n, 3n);
@@ -19,7 +18,10 @@ describe("Indexed Map", () => {
     const clonedMap = map.clone();
 
     const serializedMap = serializeIndexedMap(map);
-    const restoredMap = deserializeIndexedMap(serializedMap);
+    const restoredMap = deserializeIndexedMap({
+      serializedIndexedMap: serializedMap,
+      type: MerkleMap,
+    });
     expect(restoredMap).toBeDefined();
     if (restoredMap === undefined) return;
 
@@ -33,5 +35,36 @@ describe("Indexed Map", () => {
     expect(map).toEqual(restoredMap);
     expect(map).toEqual(clonedMap);
     expect(restoredMap).toEqual(clonedMap);
+
+    const restoredMap2 = deserializeIndexedMap({
+      serializedIndexedMap: serializedMap,
+      type: MerkleMap,
+    });
+    expect(restoredMap2).toBeDefined();
+    if (restoredMap2 === undefined) return;
+    expect(restoredMap2).toEqual(map);
+  });
+  it(`should measure the size of the serialized map and time of serialization and deserialization`, async () => {
+    const map = new MerkleMap();
+    const maxElements = 2 ** (MAP_HEIGHT - 1);
+    console.log("maxElements:", maxElements);
+    if (NUMBER_OF_ELEMENTS > maxElements) {
+      throw new Error(`NUMBER_OF_ELEMENTS must be less than ${maxElements}`);
+    }
+    console.time("setting elements");
+    for (let i = 0; i < NUMBER_OF_ELEMENTS; i++) {
+      map.set(Field.random(), Field.random());
+    }
+    console.timeEnd("setting elements");
+    console.time("serialization");
+    const serializedMap = serializeIndexedMap(map);
+    console.timeEnd("serialization");
+    console.log("serializedMap.length:", serializedMap.length);
+    console.time("deserialization");
+    const restoredMap = deserializeIndexedMap({
+      serializedIndexedMap: serializedMap,
+      type: MerkleMap,
+    });
+    console.timeEnd("deserialization");
   });
 });

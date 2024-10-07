@@ -2,6 +2,14 @@ import { Experimental, Field } from "o1js";
 import { bigintToBase64, bigintFromBase64 } from "zkcloudworker";
 const { IndexedMerkleMap } = Experimental;
 
+export interface IndexedMapSerialized {
+  height: number;
+  root: string;
+  length: string;
+  nodes: string;
+  sortedLeaves: string;
+}
+
 export function serializeIndexedMap(
   map: InstanceType<ReturnType<typeof IndexedMerkleMap>>
 ) {
@@ -30,55 +38,81 @@ export function serializeIndexedMap(
   return serializedMap;
 }
 
-export function deserializeIndexedMap(
-  serializedMap: string
-): InstanceType<ReturnType<typeof IndexedMerkleMap>> | undefined {
+export function deserializeIndexedMap(params: {
+  serializedIndexedMap: string;
+  type?: ReturnType<typeof IndexedMerkleMap>;
+}): InstanceType<ReturnType<typeof IndexedMerkleMap>> | undefined {
   try {
-    const json = JSON.parse(serializedMap);
-    if (
-      json.height === undefined ||
-      json.root === undefined ||
-      json.length === undefined ||
-      json.nodes === undefined ||
-      json.sortedLeaves === undefined
-    )
-      throw new Error("wrong json format");
-    if (typeof json.height !== "number") throw new Error("wrong height format");
-    if (typeof json.root !== "string") throw new Error("wrong root format");
-    if (typeof json.length !== "string") throw new Error("wrong length format");
-    if (typeof json.nodes !== "string") throw new Error("wrong nodes format");
-    if (typeof json.sortedLeaves !== "string")
-      throw new Error("wrong sortedLeaves format");
-
-    const nodes = JSON.parse(json.nodes, (_, v) => {
-      // Check if the value is a string that represents a BigInt
-      if (typeof v === "string" && v[0] === "n") {
-        // Remove the first 'n' and convert the string to a BigInt
-        return bigintFromBase64(v.slice(1));
-      }
-      return v;
+    const { serializedIndexedMap, type } = params;
+    const json = parseIndexedMapSerialized(serializedIndexedMap);
+    return deserializeIndexedMapInternal({
+      json,
+      type: type ?? IndexedMerkleMap(json.height),
     });
-    const sortedLeaves = JSON.parse(json.sortedLeaves).map((row: any) => {
-      return {
-        key: bigintFromBase64(row[0]),
-        nextKey: bigintFromBase64(row[1]),
-        value: bigintFromBase64(row[2]),
-        index: Number(bigintFromBase64(row[3])),
-      };
-    });
-    class MerkleMap extends IndexedMerkleMap(json.height) {}
-    const map = new MerkleMap();
-    map.root = Field.fromJSON(json.root);
-    map.length = Field.fromJSON(json.length);
-    map.data.updateAsProver(() => {
-      return {
-        nodes: nodes.map((row: any) => [...row]),
-        sortedLeaves: [...sortedLeaves],
-      };
-    });
-    return map;
   } catch (error: any) {
     console.error("Error deserializing map:", error?.message ?? error);
     return undefined;
   }
+}
+
+export function parseIndexedMapSerialized(
+  serializedMap: string
+): IndexedMapSerialized {
+  const json = JSON.parse(serializedMap);
+  if (
+    json.height === undefined ||
+    json.root === undefined ||
+    json.length === undefined ||
+    json.nodes === undefined ||
+    json.sortedLeaves === undefined
+  )
+    throw new Error("wrong IndexedMerkleMap json format");
+  if (typeof json.height !== "number")
+    throw new Error("wrong IndexedMerkleMap height format");
+  if (typeof json.root !== "string")
+    throw new Error("wrong IndexedMerkleMap root format");
+  if (typeof json.length !== "string")
+    throw new Error("wrong IndexedMerkleMap length format");
+  if (typeof json.nodes !== "string")
+    throw new Error("wrong IndexedMerkleMap nodes format");
+  if (typeof json.sortedLeaves !== "string")
+    throw new Error("wrong IndexedMerkleMap sortedLeaves format");
+  return json;
+}
+
+function deserializeIndexedMapInternal(params: {
+  json: IndexedMapSerialized;
+  type: ReturnType<typeof IndexedMerkleMap>;
+}): InstanceType<ReturnType<typeof IndexedMerkleMap>> {
+  const { json, type } = params;
+  const map = new type();
+  if (json.height !== map.height) {
+    throw new Error("wrong IndexedMap height");
+  }
+  const nodes = JSON.parse(json.nodes, (_, v) => {
+    // Check if the value is a string that represents a BigInt
+    if (typeof v === "string" && v[0] === "n") {
+      // Remove the first 'n' and convert the string to a BigInt
+      return bigintFromBase64(v.slice(1));
+    }
+    return v;
+  });
+  const sortedLeaves = JSON.parse(json.sortedLeaves).map((row: any) => {
+    return {
+      key: bigintFromBase64(row[0]),
+      nextKey: bigintFromBase64(row[1]),
+      value: bigintFromBase64(row[2]),
+      index: Number(bigintFromBase64(row[3])),
+    };
+  });
+
+  map.root = Field.fromJSON(json.root);
+  map.length = Field.fromJSON(json.length);
+  map.data.updateAsProver(() => {
+    return {
+      nodes: nodes.map((row: any) => [...row]),
+      sortedLeaves: [...sortedLeaves],
+    };
+  });
+  return map;
 }
