@@ -3,7 +3,7 @@ import { Experimental, Field } from "o1js";
 import { serializeIndexedMap, deserializeIndexedMap } from "../src/indexed-map";
 const { IndexedMerkleMap } = Experimental;
 const MAP_HEIGHT = 20;
-const NUMBER_OF_ELEMENTS = 100;
+const NUMBER_OF_ELEMENTS = 1000;
 class MerkleMap extends IndexedMerkleMap(MAP_HEIGHT) {}
 
 describe("Indexed Map serialization", () => {
@@ -48,6 +48,7 @@ describe("Indexed Map serialization", () => {
     const map = new MerkleMap();
     const maxElements = 2 ** (MAP_HEIGHT - 1);
     console.log("maxElements:", maxElements);
+    console.log("NUMBER_OF_ELEMENTS:", NUMBER_OF_ELEMENTS);
     if (NUMBER_OF_ELEMENTS > maxElements) {
       throw new Error(`NUMBER_OF_ELEMENTS must be less than ${maxElements}`);
     }
@@ -56,6 +57,9 @@ describe("Indexed Map serialization", () => {
       map.set(Field.random(), Field.random());
     }
     console.timeEnd("setting elements");
+    console.time("clone");
+    const clonedMap = map.clone();
+    console.timeEnd("clone");
     console.time("serialization");
     const serializedMap = serializeIndexedMap(map);
     console.timeEnd("serialization");
