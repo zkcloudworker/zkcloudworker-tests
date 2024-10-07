@@ -6,7 +6,7 @@ import {
   bigintToBase64,
   bigintFromBase64,
 } from "zkcloudworker";
-import assert from "assert";
+import assert from "node:assert/strict";
 const { IndexedMerkleMap } = Experimental;
 class MerkleMap extends IndexedMerkleMap(11) {}
 

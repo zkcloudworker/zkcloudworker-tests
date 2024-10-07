@@ -3633,9 +3633,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"openai@npm:^4.65.0":
-  version: 4.65.0
-  resolution: "openai@npm:4.65.0"
+"openai@npm:^4.67.1":
+  version: 4.67.1
+  resolution: "openai@npm:4.67.1"
   dependencies:
     "@types/node": "npm:^18.11.18"
     "@types/node-fetch": "npm:^2.6.4"
@@ -3651,7 +3651,7 @@ __metadata:
       optional: true
   bin:
     openai: bin/cli
-  checksum: 10c0/223f7e78355167980a18bba855d2bbb0985148efdde7d006e642ff5f33451c49f37696aec7a7bff0248befe95b46772dc0433c16db62750af38147fedc93982e
+  checksum: 10c0/123746bfac3dd4d6bfb9d6e404bdb98c50cc24a1d8bfc787bb92f20ec7031ac7bd514b3181dad863bc32e1b1e41171d9aad52a89138c00a97b4bff48c8d9e365
   languageName: node
   linkType: hard
 
@@ -4933,26 +4933,26 @@ __metadata:
     js-sha256: "npm:^0.11.0"
     nats: "npm:^2.28.2"
     o1js: "npm:^1.8.0"
-    openai: "npm:^4.65.0"
+    openai: "npm:^4.67.1"
     puppeteer: "npm:^22.15.0"
     puppeteer-extra: "npm:^3.3.6"
     puppeteer-extra-plugin-stealth: "npm:^2.11.2"
     rss-parser: "npm:^3.13.0"
     ts-jest: "npm:^29.2.5"
     typescript: "npm:^5.6.2"
-    zkcloudworker: "npm:^0.14.3"
+    zkcloudworker: "npm:^0.14.5"
   languageName: unknown
   linkType: soft
 
-"zkcloudworker@npm:^0.14.3":
-  version: 0.14.3
-  resolution: "zkcloudworker@npm:0.14.3"
+"zkcloudworker@npm:^0.14.5":
+  version: 0.14.5
+  resolution: "zkcloudworker@npm:0.14.5"
   dependencies:
     axios: "npm:^1.7.7"
     chalk: "npm:^4.1.2"
   peerDependencies:
     o1js: ^1.8.0
-  checksum: 10c0/b9dc5133333dd3a93a8ec35d9a697857dea71648e73d81123f3b44a03268b4fa1a8df2b73e14fe3bdf5d2ace322a50f22622a34ee82341316519e7d78cf37d6f
+  checksum: 10c0/941aa088f97fb44bfe661586e4e479c9e8dd296ccf9a0c066fb2cadd43dda6836a1f65ca134fa5e9f3dc68c604451b67ec080577764ea363354b6457590e1b60
   languageName: node
   linkType: hard
 

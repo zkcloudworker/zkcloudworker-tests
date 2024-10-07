@@ -6,7 +6,7 @@ import {
   getAllZkAppTxsFromBlockberry,
 } from "../src/blockberry-zkapp";
 
-const hash = "5JuLg4vnm5SEVXeti4eXsNYG3T1fsozin3ri2JEEBqV2Cyi3Qi8Z";
+const hash = "5JvS8aNnPYtG5kZXM4HQgrzgQxyvqAnrKNsU6YJ7FMXpBert7JkG";
 //"5JuWEsnFvEzTJ7PuCPdRgXt9wGNGJTBL1V9Z8ecNL24j2YsTMisu";
 //"5JvCKtiL6zqdNxN1kdLrRkhz7JGEQRMcsxfW4s4A16tsYGWRqHs6";
 const lastTokenCount = 0;
