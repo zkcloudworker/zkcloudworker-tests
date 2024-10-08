@@ -13,81 +13,81 @@ import {
   state,
   State,
   Cache,
+  FeatureFlags,
 } from "o1js";
 
-class ProgramProof extends DynamicProof<Field, Void> {
-  static publicInputType = Field;
-  static publicOutputType = Void;
-  static maxProofsVerified = 0 as const;
-}
-
-const program1 = ZkProgram({
-  name: "program1",
-  publicInput: Field,
-  methods: {
-    check: {
-      privateInputs: [Field],
-      async method(publicInput: Field, field: Field) {
-        publicInput.assertEquals(field);
-      },
-    },
-  },
-});
-
-const program2 = ZkProgram({
-  name: "program2",
-  publicInput: Field,
-  methods: {
-    check: {
-      privateInputs: [ProgramProof, VerificationKey],
-      async method(
-        publicInput: Field,
-        proof: ProgramProof,
-        vk: VerificationKey
-      ) {
-        proof.verify(vk);
-        proof.publicInput.assertEquals(publicInput);
-      },
-    },
-  },
-});
-
-export class Contract extends SmartContract {
-  @state(Field) value = State<Field>();
-
-  @method async setValue(proof: ProgramProof, vk: VerificationKey) {
-    proof.verify(vk);
-    this.value.set(proof.publicInput);
-  }
-}
-
 describe("Side loading", () => {
-  let program1Vk: VerificationKey;
-  let program2Vk: VerificationKey;
-  let proof: ProgramProof;
-  const value = Field(1);
+  it("should test side loading", async () => {
+    const program1 = ZkProgram({
+      name: "program1",
+      publicInput: Field,
+      methods: {
+        check: {
+          privateInputs: [Field],
+          async method(publicInput: Field, field: Field) {
+            publicInput.assertEquals(field);
+          },
+        },
+      },
+    });
 
-  it("should compile", async () => {
+    const featureFlags1 = await FeatureFlags.fromZkProgram(program1);
+    class Program1Proof extends DynamicProof<Field, Void> {
+      static publicInputType = Field;
+      static publicOutputType = Void;
+      static maxProofsVerified = 0 as const;
+      static featureFlags = featureFlags1;
+    }
+
+    const program2 = ZkProgram({
+      name: "program2",
+      publicInput: Field,
+      methods: {
+        check: {
+          privateInputs: [Program1Proof, VerificationKey],
+          async method(
+            publicInput: Field,
+            proof: Program1Proof,
+            vk: VerificationKey
+          ) {
+            proof.verify(vk);
+            proof.publicInput.assertEquals(publicInput);
+          },
+        },
+      },
+    });
+
+    const featureFlags2 = await FeatureFlags.fromZkProgram(program2);
+    class Program2Proof extends DynamicProof<Field, Void> {
+      static publicInputType = Field;
+      static publicOutputType = Void;
+      static maxProofsVerified = 0 as const;
+      static featureFlags = featureFlags2;
+    }
+    class Contract extends SmartContract {
+      @state(Field) value = State<Field>();
+
+      @method async setValue(proof: Program2Proof, vk: VerificationKey) {
+        proof.verify(vk);
+        this.value.set(proof.publicInput);
+      }
+    }
+    const value = Field(1);
     const cache: Cache = Cache.FileSystem("./cache");
     await Contract.compile({ cache });
-    program1Vk = (await program1.compile({ cache })).verificationKey;
-    program2Vk = (await program2.compile({ cache })).verificationKey;
-  });
+    const program1Vk = (await program1.compile({ cache })).verificationKey;
+    const program2Vk = (await program2.compile({ cache })).verificationKey;
 
-  it("should prove", async () => {
     const program1Proof = await program1.check(value, Field(1));
-    const program1SideLoadedProof = ProgramProof.fromProof(program1Proof);
+    const program1SideLoadedProof = Program1Proof.fromProof(program1Proof);
     const program2Proof = await program2.check(
       value,
       program1SideLoadedProof,
       program1Vk
     );
-    proof = ProgramProof.fromProof(program2Proof);
+    const proof = Program2Proof.fromProof(program2Proof);
     // Uncomment next line to make the test pass
     // proof = ProgramProof.fromProof(program1Proof);
-  });
-
-  it("should deploy SmartContract and set value", async () => {
     const network = await Mina.LocalBlockchain();
     Mina.setActiveInstance(network);
     const sender = network.testAccounts[0];

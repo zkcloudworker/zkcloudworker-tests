@@ -16,6 +16,7 @@ import {
   Signature,
   verify,
   Void,
+  FeatureFlags,
 } from "o1js";
 
 const program = ZkProgram({
@@ -38,6 +39,7 @@ export class SignatureProof extends DynamicProof<Field, Field> {
   static publicInputType = Field;
   static publicOutputType = Field;
   static maxProofsVerified = 0 as const;
+  static featureFlags = FeatureFlags.allMaybe;
 }
 
 export class Contract extends SmartContract {

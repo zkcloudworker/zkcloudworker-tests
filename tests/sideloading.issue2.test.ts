@@ -19,12 +19,14 @@ import {
   Cache,
   Signature,
   verify,
+  FeatureFlags,
 } from "o1js";
 
 export class AddProof extends DynamicProof<Field, Field> {
   static publicInputType = Field;
   static publicOutputType = Field;
   static maxProofsVerified = 0 as const;
+  static featureFlags = FeatureFlags.allMaybe;
 }
 
 class NFTStateInput extends Struct({

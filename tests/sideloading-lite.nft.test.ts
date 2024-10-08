@@ -31,12 +31,21 @@ import {
 } from "o1js";
 import { TEST_ACCOUNTS } from "../env.json";
 
-export class AddProof extends DynamicProof<Field, Field> {
-  static publicInputType = Field;
-  static publicOutputType = Field;
-  static maxProofsVerified = 0 as const;
-  static featureFlags = FeatureFlags.allMaybe;
-}
+const pluginProgram = ZkProgram({
+  name: "pluginProgram",
+  publicInput: Field,
+  publicOutput: Field,
+  methods: {
+    add: {
+      privateInputs: [Field],
+      async method(a: Field, b: Field) {
+        return a.add(b);
+      },
+    },
+  },
+});
+
+class PluginProof extends ZkProgram.Proof(pluginProgram) {}
 
 class NFTStateInput extends Struct({
   creator: PublicKey,
@@ -79,19 +88,19 @@ const nftProgram = ZkProgram({
       },
     },
     changeOwner: {
-      privateInputs: [PublicKey], //, Signature
+      privateInputs: [PublicKey, Signature],
       async method(
         initialState: NFTStateInput,
-        newOwner: PublicKey
+        newOwner: PublicKey,
         // https://github.com/o1-labs/o1js/issues/1854
-        //signature: Signature
+        signature: Signature
       ) {
-        // signature
-        //   .verify(initialState.owner, [
-        //     ...NFTStateInput.toFields(initialState),
-        //     ...newOwner.toFields(),
-        //   ])
-        //   .assertTrue();
+        signature
+          .verify(initialState.owner, [
+            ...NFTStateInput.toFields(initialState),
+            ...newOwner.toFields(),
+          ])
+          .assertTrue();
         return new NFTStateOutput({
           metadata: initialState.metadata,
           owner: newOwner,
@@ -100,14 +109,14 @@ const nftProgram = ZkProgram({
     },
     // Commenting the add method will make the test pass
     add: {
-      privateInputs: [AddProof, VerificationKey],
+      privateInputs: [PluginProof], // , VerificationKey
       async method(
         initialState: NFTStateInput,
-        proof: AddProof,
-        vk: VerificationKey
+        proof: PluginProof
+        //vk: VerificationKey
       ) {
         proof.publicInput.assertEquals(initialState.metadata);
-        proof.verify(vk);
+        proof.verify();
         return new NFTStateOutput({
           metadata: proof.publicOutput,
           owner: initialState.owner,
@@ -117,11 +126,14 @@ const nftProgram = ZkProgram({
   },
 });
 
-export class NFTProof extends DynamicProof<NFTStateInput, NFTStateOutput> {
-  static publicInputType = NFTStateInput;
-  static publicOutputType = NFTStateOutput;
-  static maxProofsVerified = 0 as const;
-}
+// export class NFTProof extends DynamicProof<NFTStateInput, NFTStateOutput> {
+//   static publicInputType = NFTStateInput;
+//   static publicOutputType = NFTStateOutput;
+//   static maxProofsVerified = 0 as const;
+//   static featureFlags = FeatureFlags.allMaybe;
+// }
+
+class NFTProof extends ZkProgram.Proof(nftProgram) {}
 
 interface NFTContractDeployParams extends Exclude<DeployArgs, undefined> {
   metadata: Field;
@@ -149,11 +161,13 @@ export class NFTContract extends SmartContract {
     this.canChangeOwner.set(props.canChangeOwner);
   }
 
-  @method async updateMetadata(proof: NFTProof, vk: VerificationKey) {
-    this.metadataVerificationKeyHash
-      .getAndRequireEquals()
-      .assertEquals(vk.hash);
-    proof.verify(vk);
+  @method async updateMetadata(proof: NFTProof) {
+    // , vk: VerificationKey
+    // this.metadataVerificationKeyHash
+    //   .getAndRequireEquals()
+    //   .assertEquals(vk.hash);
+    // proof.verify(vk);
+    proof.verify();
     NFTStateInput.assertEqual(
       proof.publicInput,
       new NFTStateInput({
@@ -177,20 +191,6 @@ export class NFTContract extends SmartContract {
     this.owner.set(proof.publicOutput.owner);
   }
 }
-
-const pluginProgram = ZkProgram({
-  name: "pluginProgram",
-  publicInput: Field,
-  publicOutput: Field,
-  methods: {
-    add: {
-      privateInputs: [Field],
-      async method(a: Field, b: Field) {
-        return a.add(b);
-      },
-    },
-  },
-});
 
 let nftProgramVk: VerificationKey;
 let pluginProgramVk: VerificationKey;
@@ -221,11 +221,10 @@ describe("NFT with Side loading verification key", () => {
     console.log("Sender's balance:", await accountBalanceMina(sender));
   });
 
-  it("should compile with SmartContracts", async () => {
-    console.log("compiling...");
-    console.time("compiled NFTContract");
-    await NFTContract.compile({ cache });
-    console.timeEnd("compiled NFTContract");
+  it("should compile plugin ZkProgram", async () => {
+    console.time("compiled plugin ZkProgram");
+    pluginProgramVk = (await pluginProgram.compile({ cache })).verificationKey;
+    console.timeEnd("compiled plugin ZkProgram");
   });
 
   it("should compile nft ZkProgram", async () => {
@@ -234,10 +233,11 @@ describe("NFT with Side loading verification key", () => {
     console.timeEnd("compiled NFTProgram");
   });
 
-  it("should compile plugin ZkProgram", async () => {
-    console.time("compiled plugin ZkProgram");
-    pluginProgramVk = (await pluginProgram.compile({ cache })).verificationKey;
-    console.timeEnd("compiled plugin ZkProgram");
+  it("should compile with SmartContracts", async () => {
+    console.log("compiling...");
+    console.time("compiled NFTContract");
+    await NFTContract.compile({ cache });
+    console.timeEnd("compiled NFTContract");
   });
 
   it("should deploy a SmartContract", async () => {
@@ -323,14 +323,14 @@ describe("NFT with Side loading verification key", () => {
       canChangeOwner: nftContract.canChangeOwner.get(),
     });
     console.time("change owner proof generated");
-    // const signature = Signature.create(owner.privateKey, [
-    //   ...NFTStateInput.toFields(nftInputState),
-    //   ...newOwner.toFields(),
-    // ]);
+    const signature = Signature.create(owner.privateKey, [
+      ...NFTStateInput.toFields(nftInputState),
+      ...newOwner.toFields(),
+    ]);
     const proof = await nftProgram.changeOwner(
       nftInputState,
-      newOwner
-      //signature
+      newOwner,
+      signature
     );
     const ok = await verify(proof, nftProgramVk);
     expect(ok).toBe(true);
@@ -339,14 +339,14 @@ describe("NFT with Side loading verification key", () => {
       return;
     }
     console.timeEnd("change owner proof generated");
-    const changeOwnerProof = NFTProof.fromProof(proof);
+    //const changeOwnerProof = NFTProof.fromProof(proof);
     console.time("prepare change owner tx");
     await fetchMinaAccount({ publicKey: zkAppKey.publicKey, force: true });
     await fetchMinaAccount({ publicKey: sender, force: true });
     const tx = await Mina.transaction(
       { sender, fee: await fee(), memo: "Update metadata" },
       async () => {
-        await nftContract.updateMetadata(changeOwnerProof, nftProgramVk);
+        await nftContract.updateMetadata(proof); // (changeOwnerProof, nftProgramVk);
       }
     );
     await tx.prove();
@@ -357,8 +357,8 @@ describe("NFT with Side loading verification key", () => {
       await sleep(10000);
     }
     await fetchMinaAccount({ publicKey: zkAppKey.publicKey, force: true });
-    const owner = nftContract.owner.get();
-    expect(owner.toBase58()).toBe(newOwner.toBase58());
+    const checkOwner = nftContract.owner.get();
+    expect(checkOwner.toBase58()).toBe(newOwner.toBase58());
   });
 
   it("should update metadata", async () => {
@@ -381,14 +381,14 @@ describe("NFT with Side loading verification key", () => {
       nftContract.owner.get()
     );
     console.timeEnd("metadata proof generated");
-    const metadataProof = NFTProof.fromProof(proof);
+    //const metadataProof = NFTProof.fromProof(proof);
     console.time("prepare update metadata tx");
     await fetchMinaAccount({ publicKey: zkAppKey.publicKey, force: true });
     await fetchMinaAccount({ publicKey: sender, force: true });
     const tx = await Mina.transaction(
       { sender, fee: await fee(), memo: "Update metadata" },
       async () => {
-        await nftContract.updateMetadata(metadataProof, nftProgramVk);
+        await nftContract.updateMetadata(proof); // (metadataProof, nftProgramVk);
       }
     );
     await tx.prove();
