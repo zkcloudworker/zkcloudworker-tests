@@ -1,7 +1,6 @@
 import { Experimental, Field } from "o1js";
 import { bigintToBase64, bigintFromBase64 } from "zkcloudworker";
 const { IndexedMerkleMap } = Experimental;
-type IndexedMerkleMapBase = Experimental.IndexedMerkleMap;
 
 export interface IndexedMapSerialized {
   height: number;
@@ -12,8 +11,7 @@ export interface IndexedMapSerialized {
 }
 
 export function serializeIndexedMap(
-  //map: InstanceType<ReturnType<typeof IndexedMerkleMap>>
-  map: IndexedMerkleMapBase
+  map: InstanceType<ReturnType<typeof IndexedMerkleMap>>
 ) {
   const serializedMap = JSON.stringify(
     {

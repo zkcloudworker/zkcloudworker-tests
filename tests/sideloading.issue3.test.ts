@@ -31,12 +31,12 @@ describe("Side loading", () => {
       },
     });
 
-    const featureFlags1 = await FeatureFlags.fromZkProgram(program1);
-    class Program1Proof extends DynamicProof<Field, Void> {
+    //const featureFlags1 = await FeatureFlags.fromZkProgram(program1);
+    class NonRecursiveProof extends DynamicProof<Field, Void> {
       static publicInputType = Field;
       static publicOutputType = Void;
-      static maxProofsVerified = 2 as const;
-      static featureFlags = featureFlags1;
+      static maxProofsVerified = 0 as const;
+      static featureFlags = FeatureFlags.allMaybe;
     }
 
     const program2 = ZkProgram({
@@ -44,10 +44,10 @@ describe("Side loading", () => {
       publicInput: Field,
       methods: {
         check: {
-          privateInputs: [Program1Proof, VerificationKey],
+          privateInputs: [NonRecursiveProof, VerificationKey],
           async method(
             publicInput: Field,
-            proof: Program1Proof,
+            proof: NonRecursiveProof,
             vk: VerificationKey
           ) {
             proof.verify(vk);
@@ -57,17 +57,17 @@ describe("Side loading", () => {
       },
     });
 
-    const featureFlags2 = await FeatureFlags.fromZkProgram(program2);
-    class Program2Proof extends DynamicProof<Field, Void> {
+    //const featureFlags2 = await FeatureFlags.fromZkProgram(program2);
+    class RecursiveProof extends DynamicProof<Field, Void> {
       static publicInputType = Field;
       static publicOutputType = Void;
-      static maxProofsVerified = 0 as const;
-      static featureFlags = featureFlags2;
+      static maxProofsVerified = 2 as const;
+      static featureFlags = FeatureFlags.allMaybe;
     }
     class Contract extends SmartContract {
       @state(Field) value = State<Field>();
 
-      @method async setValue(proof: Program2Proof, vk: VerificationKey) {
+      @method async setValue(proof: RecursiveProof, vk: VerificationKey) {
         proof.verify(vk);
         this.value.set(proof.publicInput);
       }
@@ -79,13 +79,13 @@ describe("Side loading", () => {
     const program2Vk = (await program2.compile({ cache })).verificationKey;
 
     const program1Proof = await program1.check(value, Field(1));
-    const program1SideLoadedProof = Program1Proof.fromProof(program1Proof);
+    const program1SideLoadedProof = NonRecursiveProof.fromProof(program1Proof);
     const program2Proof = await program2.check(
       value,
       program1SideLoadedProof,
       program1Vk
     );
-    const proof = Program2Proof.fromProof(program2Proof);
+    const proof = RecursiveProof.fromProof(program2Proof);
     // Uncomment next line to make the test pass
     // proof = ProgramProof.fromProof(program1Proof);
     const network = await Mina.LocalBlockchain();
