@@ -61,3 +61,4 @@ flycheck_*.el
 .clinic/
 addresses.json
 isolate-*-v8.log
+/node_trace.1.log
