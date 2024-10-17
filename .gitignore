@@ -58,3 +58,6 @@ flycheck_*.el
 # network security
 /network-security.data
 
+.clinic/
+addresses.json
+isolate-*-v8.log
