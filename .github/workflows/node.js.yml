@@ -75,6 +75,7 @@ jobs:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
     # replace the version number
+
     - run: sed -e's!O1JSVERSION!${{ matrix.o1js-version }}!g' package.json.template> package.json
     - run: cp test-env.json  env.json
     - run: npm install
@@ -101,6 +102,5 @@ jobs:
     - name: Archive results
       uses: meta-introspector/upload-artifact@v4
       with:
-#        name: ${{ env.TEST_NAME }}.perf.data.tar.gz
-        name: perf.data.tar.gz
+        name:  ${{ matrix.node-version }}${{ matrix.o1js-version }}-perf.data.tar.gz
         path: perf.data.tar.gz
