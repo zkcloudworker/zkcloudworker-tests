@@ -59,9 +59,10 @@ jobs:
 
         ]
         node-version: [
-        18.x
-      #, 20.x
-      #, 22.x
+      #  18.x
+      , 20.x
+      , 21.x
+      , 22.x
         ]
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
 
@@ -74,7 +75,8 @@ jobs:
         cache: 'npm'
     # replace the version number
     - run: sed -e's!O1JSVERSION!${{ matrix.o1js-version }}!g' package.json.template> package.json
-    - run: cp test-env.json  env.json 
+    - run: cp test-env.json  env.json
+    - run: npm install
     - run: npm ci
     - run: npm run build --if-present
     - run: |
