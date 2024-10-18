@@ -90,9 +90,13 @@ jobs:
       run: ls -latr 
     - name: list
       run: find
-        
+    - name: mkdir profile
+      run: mkdir ./profile
+    - name: move
+      run: mv isolate-*-v8.log Heap.*.heapprofile CPU.*.cpuprofile ./profile
+
     - name: archive the results
-      run: tar -czf perf.data.tar.gz . 
+      run: tar -czf perf.data.tar.gz ./profile/
 
     - name: Archive results
       uses: meta-introspector/upload-artifact@v4
