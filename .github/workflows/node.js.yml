@@ -86,6 +86,10 @@ jobs:
         node --heap-prof $(which npm) test
     - run: |
         node --cpu-prof $(which npm) test
+    - name: list
+      run: ls -latr 
+    - name: list
+      run: find
         
     - name: archive the results
       run: tar -czf perf.data.tar.gz . 
