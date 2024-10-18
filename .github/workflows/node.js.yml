@@ -86,3 +86,13 @@ jobs:
         node --heap-prof $(which npm) test
     - run: |
         node --cpu-prof $(which npm) test
+        
+    - name: archive the results
+      run: tar -czf perf.data.tar.gz . 
+
+    - name: Archive results
+      uses: meta-introspector/upload-artifact@v4
+      with:
+#        name: ${{ env.TEST_NAME }}.perf.data.tar.gz
+        name: perf.data.tar.gz
+        path: perf.data.tar.gz
