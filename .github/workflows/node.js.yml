@@ -4,6 +4,13 @@
 name: Node.js CI
 
 on:
+  workflow_dispatch:
+    inputs:
+      #image_url:
+      #  description: 'Docker url to execute'
+      #default: "ghcr.io/meta-introspector/o1js/o1js-perf-recording:5ce0221662cecbca9a3de05601af94a15b154a3bcf8bafcb0cfa1f5b9f407bdc"
+      #default: "ghcr.io/meta-introspector/o1js/o1js-perf-recording:latest"
+
   push:
     branches: [ "main","feature/multi-o1js" ]
   pull_request:
