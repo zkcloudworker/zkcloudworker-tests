@@ -148,7 +148,7 @@ jobs:
       run: |
         #!/bin/bash
         #remove Double quote ", Colon :, Less than <, Greater than >, Vertical bar |, Asterisk *, Question mark ?, Carriage return \r, Line feed \n, Backslash \, Forward slash /
-        MODIFIED_O1JS_VERSION=${O1JS_VERSION/[\"\<\>\|\*\?\r\n\\\:\.\#\/]/-}
+        MODIFIED_O1JS_VERSION=${O1JS_VERSION//[\"\<\>\|\*\?\r\n\/\:\.\#\/]/-}
         echo "MODIFIED_O1JS_VERSION=${MODIFIED_O1JS_VERSION}"
         echo "MODIFIED_O1JS_VERSION=${MODIFIED_O1JS_VERSION}" >> "$GITHUB_ENV"
 
