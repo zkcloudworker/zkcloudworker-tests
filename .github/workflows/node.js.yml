@@ -157,7 +157,7 @@ jobs:
     - run: cp test-env.json  env.json
 
     # install the built version from subdir
-    - run: npm install --save --force vendor/o1js
+    - run: npm install --save --force ./vendor/o1js/
     - run: npm install --force
     - run: |
         rm -rf node_modules
