@@ -62,3 +62,5 @@ flycheck_*.el
 addresses.json
 isolate-*-v8.log
 /node_trace.1.log
+/*-perf.data.tar.gz/
+/perf.data.tar.gz/
