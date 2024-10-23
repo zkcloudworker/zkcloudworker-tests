@@ -138,7 +138,7 @@ jobs:
 
     - run: |
         git submodule init
-        GIT_LFS_SKIP_SMUDGE=1 git submodule update --recursive --force
+        GIT_LFS_SKIP_SMUDGE=1 git submodule update --recursive --force --recommend-shallow
         npm install # get the reqs
         npm ci
         npm run build
