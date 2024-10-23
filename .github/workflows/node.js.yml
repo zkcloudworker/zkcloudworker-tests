@@ -121,7 +121,7 @@ jobs:
         cache: 'npm'
     # replace the version number
 
-    - run: sed -e"s!O1JSVERSION!${{ matrix.o1js-version }}!g" package.json.template> package.json
+    - run: sed -e's!O1JSVERSION!${{ matrix.o1js-version }}!g' package.json.template> package.json
     - run: cp test-env.json  env.json
     - run: npm install --force
     - run: npm ci --force
