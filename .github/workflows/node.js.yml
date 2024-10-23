@@ -126,10 +126,11 @@ jobs:
     - run: cp package.json.template package.json
     - run: cp test-env.json  env.json
       
-    - run: npm install --force ${{ matrix.o1js-version }}
+    - run: npm install --save --force ${{ matrix.o1js-version }}
     - run: npm install --force
     - run: npm ci --force
     - run: npm run build --if-present
+    - run: npm ls
     - run: |
         node --prof --heap-prof --cpu-prof --expose-gc --enable-source-maps --stack-trace-limit=1000 ./node_modules/.bin/jest --runInBand --logHeapUsage || echo skip fail
     - name: list
