@@ -138,6 +138,8 @@ jobs:
 
     - run: |
         git submodule init
+        git config -f .gitmodules submodule.src/mina.shallow true
+        git config -f .gitmodules submodule.src/o1js-bindings.shallow true
         GIT_LFS_SKIP_SMUDGE=1 git submodule update --recursive --force --recommend-shallow
         npm install # get the reqs
         npm ci
