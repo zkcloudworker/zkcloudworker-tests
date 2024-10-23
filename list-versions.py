@@ -13,4 +13,4 @@ for x in r.remotes:
                 diff2 = datetime.timedelta(seconds=diff)
                 days = diff2.days
                 if days < 30:
-                    print(str(url)+"#" +str(z.commit)+ ", #" + time.asctime(cd) + " " + str(days) + " " + z.name)
+                    print("\t\""+str(url)+"#" +str(z.commit)+ "\", #" + time.asctime(cd) + " " + str(days) + " " + z.name)
