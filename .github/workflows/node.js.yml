@@ -1,18 +1,9 @@
-# This workflow will do a clean installation of node dependencies, cache/restore them, build the source code and run tests across different versions of node
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-nodejs
-
 name: Node.js CI
 
 on:
   workflow_dispatch:
-    inputs:
-      #image_url:
-      #  description: 'Docker url to execute'
-      #default: "ghcr.io/meta-introspector/o1js/o1js-perf-recording:5ce0221662cecbca9a3de05601af94a15b154a3bcf8bafcb0cfa1f5b9f407bdc"
-      #default: "ghcr.io/meta-introspector/o1js/o1js-perf-recording:latest"
-
   push:
-    branches: [ "main","feature/multi-o1js" ]
+    branches: [ "main","feature/multi-o1js", "feature/other-branches" ]
   pull_request:
     branches: [ "main" ]
 
@@ -25,12 +16,66 @@ jobs:
       matrix:
         o1js-version: [
 
+        https://github.com/o1-labs/o1js#fa3e1ef0bdde2960fc8ddf0334e26ebb77b1fe4a, #Sat Oct 19 13:58:39 2024 3 origin/2024-10-bugfix-lb-performance
+        https://github.com/o1-labs/o1js#3d33cb4034e77b5ebe8401f77b6e17ccfd8b9f2a, #Tue Oct 22 14:31:09 2024 0 origin/HEAD
+        https://github.com/o1-labs/o1js#3634cdd14a0170c3874abc7f42dacc7ac38f21a4, #Thu Oct 17 18:28:41 2024 5 origin/brian/permisions-precondition
+        https://github.com/o1-labs/o1js#6eb17094635175d0f817812a0f1c8fd208a70562, #Fri Oct 11 13:59:57 2024 11 origin/chunking-mvp-bug
+        https://github.com/o1-labs/o1js#74121af790d7a0978b93afa8914a3f0b7bed72a7, #Wed Sep 25 18:39:22 2024 27 origin/develop
+        https://github.com/o1-labs/o1js#fcd6ebf0799a078b26abcbaf26ba9071182d1f82, #Fri Oct 18 12:47:21 2024 5 origin/feature/dynamic-arrays
+        https://github.com/o1-labs/o1js#729f550a2be0df65d8b7db4d1a062e89b33d27b7, #Fri Oct 18 12:46:10 2024 5 origin/feature/lookup-runtime-tables
+        https://github.com/o1-labs/o1js#5e5b8423b5a7ff5e1005551cc2aaea182b9f2a9c, #Wed Oct 23 08:13:30 2024 0 origin/feature/non-pure-zkprogram-inputs
+        https://github.com/o1-labs/o1js#526a5cc6297a0e3d338aeade87c881f8a6a7c185, #Fri Oct  4 19:29:00 2024 18 origin/feature/update-tokencontract-transfer
+        https://github.com/o1-labs/o1js#3d33cb4034e77b5ebe8401f77b6e17ccfd8b9f2a, #Tue Oct 22 14:31:09 2024 0 origin/main
+        https://github.com/o1-labs/o1js#117694ca361d179d4a65741ac7b1d72ba4c7ad23, #Wed Oct 23 06:21:39 2024 0 origin/main-in-develop
+        https://github.com/o1-labs/o1js#914572272fbcd2190710dac3526f506e346d598d, #Mon Oct 21 15:20:43 2024 1 origin/merge-main-v2-1
+        https://github.com/o1-labs/o1js#4e1f855f6314ace8e1c16929531d5ccb3e7f9876, #Wed Oct 16 13:39:30 2024 6 origin/meta/setup-codeowners
+        https://github.com/o1-labs/o1js#4774682535a191fd5edcb0dae054d79ae96e8114, #Tue Oct 22 12:15:03 2024 1 origin/new-api
+        https://github.com/o1-labs/o1js#8d856e67994934a10b6e3d40d689b7b08904d660, #Mon Oct 21 14:49:37 2024 1 origin/release/v1.9.1
+        https://github.com/o1-labs/o1js#075e8d5858cf9af4ac71397208b9232f5a436e74, #Tue Oct 22 14:32:31 2024 0 origin/test-codeowners
+        https://github.com/o1-labs/o1js#103a7f9ffa812c69d9202ba0731c86989ada2f43, #Tue Oct 22 15:43:37 2024 0 origin/test-codeowners-2
+        https://github.com/o1-labs/o1js#ad774e191a5331f3106bf704e277dc33109e625c, #Mon Oct 21 15:47:17 2024 1 origin/v1
+        https://github.com/o1-labs/o1js#4fcd62cdde9fda32416b7d29c51e6cf52d3c8d8f, #Tue Oct 15 18:42:59 2024 7 origin/v2
+        https://github.com/o1-labs/o1js#b04520d100a01ed4b1f018155acb65d17f57ef57, #Mon Oct 21 21:18:09 2024 1 origin/v3
+        git+https://github.com/zksecurity/o1js.git#f7ac92e752af8d44c37b649017a08ce5aa6b8760, #Thu Oct 10 19:48:51 2024 12 zksecurity/experiment/uint8-value
+        git+https://github.com/zksecurity/o1js.git#ee527961c427d43ea709fce9a0fc3b56c0db3d72, #Fri Oct 11 15:05:32 2024 11 zksecurity/feature/provable-proofs-4
+        git+https://github.com/zksecurity/o1js.git#e94bb7e4ef2283ac285beaedfb498243a47c851f, #Fri Oct 11 19:35:25 2024 11 zksecurity/fix/package-size
+        git+https://github.com/zksecurity/o1js.git#de4ade3644c24899a03d7d55386abe633bdab899, #Wed Oct 16 13:46:14 2024 6 zksecurity/main
+        git+https://github.com/zksecurity/o1js.git#4c605ff3e7d010ac109cfecdd664a52f1ec4e5c6, #Thu Oct 10 11:58:27 2024 13 zksecurity/zksecurity-ci
+        git+https://github.com/dfstio/o1js.git#8dfd13ee65cbdafe2009dc98f635d555560c3501, #Mon Oct  7 16:07:42 2024 15 dfstio/export-indexed-merkle-map-base
+        git+https://github.com/dfstio/o1js.git#59a6c584e8024ec46ac18acc8e43ee125009b36d, #Sat Oct  5 14:57:43 2024 17 dfstio/main
+        git+https://github.com/Ressac-No1/o1js-ZKADS-extension.git#bf0e09e61461e05c1fc6e8a617343d1623bdae7f, #Tue Oct  1 16:11:37 2024 21 Ressac-No1/2024-09-refactor-offchain-state
+        git+https://github.com/Ressac-No1/o1js-ZKADS-extension.git#7a0c8f6222b1522080a7efcfef82c64bf38842e5, #Fri Oct  4 19:32:06 2024 18 Ressac-No1/brian/permisions-precondition
+        git+https://github.com/Ressac-No1/o1js-ZKADS-extension.git#74121af790d7a0978b93afa8914a3f0b7bed72a7, #Wed Sep 25 18:39:22 2024 27 Ressac-No1/develop
+        git+https://github.com/Ressac-No1/o1js-ZKADS-extension.git#5e67f233af4ad1212d7be4208127b81790952dc6, #Mon Oct  7 07:03:19 2024 16 Ressac-No1/feature/blake2b
+        git+https://github.com/Ressac-No1/o1js-ZKADS-extension.git#0598bd09ee5870a38772ccf030c03835ecc1bd0f, #Fri Oct  4 16:49:08 2024 18 Ressac-No1/feature/dynamic-arrays
+        git+https://github.com/Ressac-No1/o1js-ZKADS-extension.git#92fc7286af9fbd2b541b4aeccf697b5746ed14ba, #Tue Oct  8 13:04:50 2024 15 Ressac-No1/feature/stateful-MKT-extension
+        git+https://github.com/Ressac-No1/o1js-ZKADS-extension.git#526a5cc6297a0e3d338aeade87c881f8a6a7c185, #Fri Oct  4 19:29:00 2024 18 Ressac-No1/feature/update-tokencontract-transfer
+        git+https://github.com/Ressac-No1/o1js-ZKADS-extension.git#59a6c584e8024ec46ac18acc8e43ee125009b36d, #Sat Oct  5 14:57:43 2024 17 Ressac-No1/main
+        git+https://github.com/Ressac-No1/o1js-ZKADS-extension.git#74f4aee35143a063ff686d62a960b5e8933930bb, #Sun Sep 29 18:34:20 2024 23 Ressac-No1/new-api
+        git+https://github.com/Ressac-No1/o1js-ZKADS-extension.git#bc27bc376e0bf5ae096c0c5ad13098539b373326, #Tue Oct  1 00:06:12 2024 22 Ressac-No1/release/v1.8.1
+        git+https://github.com/Ressac-No1/o1js-ZKADS-extension.git#eb56a567f006f1d6aa9fb2254cfa5c12dfd92e8c, #Thu Sep 26 12:17:41 2024 27 Ressac-No1/v2
+        git+https://github.com/GACWR/o1js.git#74121af790d7a0978b93afa8914a3f0b7bed72a7, #Wed Sep 25 18:39:22 2024 27 GACWR/main
+        
+        git+https://github.com/krzysztofwujs/o1js.git#0f8ff810237102d26071c8f2b8fb49d0e5d252e3, #Thu Oct 10 13:21:42 2024 13 krzysztofwujs/main
+        git+https://github.com/krzysztofwujs/o1js.git#2ad7b592b18102412674395095dcc72934a56251, #Tue Oct 15 01:20:55 2024 8 krzysztofwujs/release/v1.8.1
+        git+https://github.com/satyambnsal/o1js.git#4cd57a3d00e2a3b75248c7f8ec3a371169b2f51a, #Tue Oct 15 01:26:44 2024 8 satyambnsal/release/v0.18.1
+        git+https://github.com/aerius-labs/o1js.git#5ac9d5e383c779a1a5d4ce42049ea84f43e65849, #Tue Oct 15 00:47:32 2024 8 aerius-labs/release/v1.4.1
+        git+https://github.com/iam-dev/o1js.git#b669783887a7df3ad36a51e358aa2eae207073bb, #Tue Oct 15 00:15:57 2024 8 iam-dev/release/v0.18.1
+        git+https://github.com/lambdaclass/o1js.git#0d9e858777370c5c7ccf002f9b0cb0510cb3a20e, #Tue Oct 15 00:17:57 2024 8 lambdaclass/release/v0.16.3
+        git+https://github.com/rpanic/o1js.git#d75cf6cb6928c85e6323728e577c2f031f7fde25, #Thu Oct 10 11:33:31 2024 13 rpanic/fix/state-fetch-token
+        git+https://github.com/rpanic/o1js.git#52773246910225cd15d08d5f7b11bd3996bf14b3, #Thu Oct  3 13:50:54 2024 19 rpanic/main
+        git+https://github.com/rpanic/o1js.git#dc44ec443d3271319c6004261659ddb069c51659, #Tue Oct  1 01:48:52 2024 22 rpanic/release/v0.18.1
+        git+https://github.com/rpanic/o1js.git#f842f7b603fa04c182bee6fc0b0ecdd3329718dd, #Tue Oct 15 01:41:35 2024 8 rpanic/release/v1.8.1
+        git+https://github.com/rpanic/o1js.git#ca9bb8855bd3061877e61ff87ae6a51096010e16, #Fri Oct  4 07:41:20 2024 19 rpanic/rpanic/expose-dummy-vk
+        git+https://github.com/marekyggdrasil/o1js.git#e27a6fdd0887486a17d038d2f9bc97f4b726630a #Tue Oct 15 00:37:46 2024 8 marekyggdrasil/release/v1.3.2
+        
+
         # from git found these tags
         # 0.10.0,
         # 0.10.1,0.11.0,0.11.1,0.11.2,0.11.3,0.11.4,0.12.1,0.12.2,0.14.0,0.14.3,0.15.0,0.15.1,0.15.2,0.15.3,0.15.4,0.16.0,0.16.1,0.16.2,0.17.0,0.18.0,0.2.0,0.2.2,0.3.4,0.3.7,0.5.3,0.5.4,0.6.0,0.7.0,0.7.2,0.7.3,
         # 0.8.0,0.9.0,0.9.1,0.9.2,0.9.5,0.9.7,0.9.8,1.0.0,1.0.1,1.1.0,1.2.0, 1.3.0
         
-        1.9.0,1.8.0,1.7.0
+#        1.9.0,1.8.0,1.7.0
         #,1.6.0
 #1.5.1
 #1.5.0
@@ -83,25 +128,31 @@ jobs:
     - run: npm ci
     - run: npm run build --if-present
     - run: |
-        node --prof --expose-gc ./node_modules/.bin/jest --runInBand --logHeapUsage || echo skip fail
-    - run: |
-        node --heap-prof --expose-gc ./node_modules/.bin/jest --runInBand --logHeapUsage || echo skip fail
-    - run: |
-        node --cpu-prof --expose-gc ./node_modules/.bin/jest --runInBand --logHeapUsage || echo skip fail
+        node --prof --heap-prof --cpu-prof --expose-gc --enable-source-maps --stack-trace-limit=1000 ./node_modules/.bin/jest --runInBand --logHeapUsage || echo skip fail
     - name: list
       run: ls -latr 
     - name: list
       run: find
     - name: mkdir profile
       run: mkdir ./profile
-    - name: move
-      run: mv isolate-*-v8.log Heap.*.heapprofile CPU.*.cpuprofile ./profile
+    - name: move2
+      run: mv isolate-*-v8.log  ./profile || echo ok
+      run: mv  Heap.*.heapprofile ./profile || echo ok
+      run: mv  CPU.*.cpuprofile ./profile || echo ok
 
     - name: archive the results
       run: tar -czf perf.data.tar.gz ./profile/
 
+    - name: Sets clean version name
+      env:
+        O1JS_VERSION: ${{ matrix.o1js-version }}
+      run: |
+        #!/bin/bash
+        MODIFIED_O1JS_VERSION=${O1JS_VERSION/[\.\#\/]/-}
+        echo "MODIFIED_O1JS_VERSION=${MODIFIED_O1JS_VERSION}" >> "$GITHUB_ENV"
+
     - name: Archive results
       uses: meta-introspector/upload-artifact@v4
       with:
-        name:  ${{ matrix.node-version }}${{ matrix.o1js-version }}-perf.data.tar.gz
+        name: ${{ matrix.node-version }}${{ env.MODIFIED_O1JS_VERSION }}-perf.data.tar.gz
         path: perf.data.tar.gz
