@@ -129,10 +129,11 @@ jobs:
         echo "O1JS_REPO=${O1JS_REPO}" >> "$GITHUB_ENV"
         echo "O1JS_REF=${O1JS_REF}" >> "$GITHUB_ENV"
     - uses: meta-introspector/checkout@v4
-      repository : ${{ env.O1JS_REPO }}
-      ref : ${{ env.O1JS_REF }}
-      path: vendor/o1js
-      #submodules: recursive
+      with:
+        repository : ${{ env.O1JS_REPO }}
+        ref : ${{ env.O1JS_REF }}
+        path: vendor/o1js
+        #submodules: recursive
     # now build and install the submodule
 
     - run: |
