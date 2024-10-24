@@ -189,3 +189,14 @@ Output file is .clinic/613699.clinic-flame
 `clinic flame --visualize-only .clinic/613699.clinic-flame`
 `clinic doctor --collect-only -- node "/home/mdupont/.local/share/pnpm/global/5/node_modules/jest/bin/jest.js" "tests/sideloading.nft1.190.test.ts"`
 `clinic doctor --visualize-only .clinic/628061.clinic-doctor`
+
+
+```
+  gh repo set-default
+  gh run download
+
+```
+
+```
+ls
+```
