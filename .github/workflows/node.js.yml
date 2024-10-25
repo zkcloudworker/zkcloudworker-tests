@@ -58,9 +58,9 @@ jobs:
           #           - "git+https://github.com/zksecurity/o1js.git#e94bb7e4ef2283ac285beaedfb498243a47c851f" #Fri Oct 11 19:35:25 2024 11 zksecurity/fix/package-size
           #           - "git+https://github.com/zksecurity/o1js.git#ee527961c427d43ea709fce9a0fc3b56c0db3d72" #Fri Oct 11 15:05:32 2024 11 zksecurity/feature/provable-proofs-4
           #           - "git+https://github.com/zksecurity/o1js.git#f7ac92e752af8d44c37b649017a08ce5aa6b8760" #Thu Oct 10 19:48:51 2024 12 zksecurity/experiment/uint8-value
-          #          - "git+https://github.com/Ressac-No1/o1js-ZKADS-extension.git#59a6c584e8024ec46ac18acc8e43ee125009b36d" #Sat Oct  5 14:57:43 2024 17 Ressac-No1/main
-          #          - "git+https://github.com/Ressac-No1/o1js-ZKADS-extension.git#5e67f233af4ad1212d7be4208127b81790952dc6" #Mon Oct  7 07:03:19 2024 16 Ressac-No1/feature/blake2b
-          # #          - "git+https://github.com/GACWR/o1js.git#74121af790d7a0978b93afa8914a3f0b7bed72a7" #Wed Sep 25 18:39:22 2024 27 GACWR/main
+          # - "git+https://github.com/Ressac-No1/o1js-ZKADS-extension.git#59a6c584e8024ec46ac18acc8e43ee125009b36d" #Sat Oct  5 14:57:43 2024 17 Ressac-No1/main
+          # - "git+https://github.com/Ressac-No1/o1js-ZKADS-extension.git#5e67f233af4ad1212d7be4208127b81790952dc6" #Mon Oct  7 07:03:19 2024 16 Ressac-No1/feature/blake2b
+          # - "git+https://github.com/GACWR/o1js.git#74121af790d7a0978b93afa8914a3f0b7bed72a7" #Wed Sep 25 18:39:22 2024 27 GACWR/main
           # - "git+https://github.com/Ressac-No1/o1js-ZKADS-extension.git#74121af790d7a0978b93afa8914a3f0b7bed72a7" #Wed Sep 25 18:39:22 2024 27 Ressac-No1/develop
           # - "git+https://github.com/Ressac-No1/o1js-ZKADS-extension.git#74f4aee35143a063ff686d62a960b5e8933930bb" #Sun Sep 29 18:34:20 2024 23 Ressac-No1/new-api
           # - "git+https://github.com/Ressac-No1/o1js-ZKADS-extension.git#7a0c8f6222b1522080a7efcfef82c64bf38842e5" #Fri Oct  4 19:32:06 2024 18 Ressac-No1/brian/permisions-precondition
