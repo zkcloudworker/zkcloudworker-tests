@@ -150,13 +150,13 @@ jobs:
         GIT_LFS_SKIP_SMUDGE=1 git submodule update --recursive --force --recommend-shallow
         npm install # get the reqs
         npm ci
-        npm run build || echo skip errors on build        
+        npm run build || echo skip errors on build 1
       working-directory: vendor/o1js
       
     - run: |
         npm install # get the reqs
         npm ci
-        npm run build || echo skip errors on build        
+        npm run build --if-present || echo skip error on build 2
       working-directory: vendor/zkcloudworker-lib
 
     - name: Use Node.js ${{ matrix.node-version }}
@@ -171,14 +171,16 @@ jobs:
     - run: cp package.json.template package.json
     - run: cp test-env.json  env.json
 
-    # install the built version from subdir
+    # install the vendor versions from subdirs
+    - run: npm install --save --force ./vendor/zkcloudworker-lib
     - run: npm install --save --force ./vendor/o1js/
+    
     - run: npm install --force
 #        rm -rf node_modules
 #        npm cache clean --force
 #        npm install
     - run: npm ci --force
-    - run: npm run build --if-present || echo skip error
+    - run: npm run build --if-present || echo skip error on build 3
     - run: npm ls
       # copy the recursive build down
     - run: cp -vr vendor/o1js/dist/* dist/
