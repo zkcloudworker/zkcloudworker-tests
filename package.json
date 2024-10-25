@@ -19,14 +19,12 @@
     "axios": "^1.7.7",
     "js-sha256": "^0.11.0",
     "nats": "^2.28.2",
-    "node-stream-zip": "^1.15.0",
-    "o1js": "file:o1js",
     "openai": "^4.67.3",
     "puppeteer": "^22.15.0",
     "puppeteer-extra": "^3.3.6",
     "puppeteer-extra-plugin-stealth": "^2.11.2",
     "rss-parser": "^3.13.0",
-    "zkcloudworker": "^0.14.9"
+    "typedoc": "^0.26.10"    
   },
   "jest": {
     "preset": "ts-jest",

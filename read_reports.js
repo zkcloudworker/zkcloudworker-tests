@@ -27,8 +27,10 @@ zip.on('ready', () => {
 				if (total == 32){
 				}
 				else {
-				    console.log(`Entry ${entry.name}`,entry.size);
-				    console.log(parts[1]);
+				    // extract hash
+				    myhash = entry.name.split(",")[0].split("#")[1].split("/")[0];
+				    console.log(myhash);
+				    //console.log(parts[1]);
 				}
 				
 			    }

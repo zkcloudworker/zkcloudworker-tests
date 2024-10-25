@@ -234,3 +234,10 @@ Output file is .clinic/613699.clinic-flame
 2. nektos/act to test github actions
 
 `bash ./act.sh`  will test the github actions locally (require gh and act)
+
+## exract hashs from short tests
+```
+node read_reports.js > parts.txt
+grep -F -f parts.txt .github/workflows/node.js.yml 
+````
+this filters the test list to the failed ones
