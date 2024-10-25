@@ -197,11 +197,8 @@ Output file is .clinic/613699.clinic-flame
 
 ```
 
-```
-ls
-```
-
-mdupont@mdupont-G470:~/2024/10/17/zkcloudworker-tests2$ node --help | grep prof # data/20.xgit-https---github-com-zksecu-ity-o1js-git-4c605ff3e7d010ac109cfecdd664a52f1ec4e5c6-perf.data.tar.gz/profile/isolate-0x73763e0-2383-v8.log
+# Prof help
+`node --help | grep prof `
   --cpu-prof                  Start the V8 CPU profiler on start up,
                               and write the CPU profile to disk
                               before exit. If --cpu-prof-dir is not
@@ -229,4 +226,11 @@ mdupont@mdupont-G470:~/2024/10/17/zkcloudworker-tests2$ node --help | grep prof 
   --prof                      Generate V8 profiler output.
   --prof-process              process V8 profiler output generated
                               using --prof
-mdupont@mdupont-G470:~/2024/10/17/zkcloudworker-tests2$ 
+# test procedure
+
+1. yaml shellcheck
+`yaml_shellcheck .github/workflows/node.js.yml `
+
+2. nektos/act to test github actions
+
+`bash ./act.sh`  will test the github actions locally (require gh and act)

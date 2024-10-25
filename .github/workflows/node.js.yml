@@ -132,7 +132,7 @@ jobs:
         #* [new branch]      feature/open_deps -> 
     - uses: meta-introspector/checkout@v4
       with:
-        repository : https://github.com/meta-introspector/zkcloudworker-lib.git
+        repository : meta-introspector/zkcloudworker-lib
         ref : feature/open_deps
         path: vendor/zkcloudworker-lib
 
