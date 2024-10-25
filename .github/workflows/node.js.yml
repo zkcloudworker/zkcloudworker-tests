@@ -171,7 +171,8 @@ jobs:
     - run: npm run build --if-present || echo skip error on build 3
     - run: npm ls
       # copy the recursive build down
-    - run: cp -vr vendor/*/dist/* dist/
+    - run: cp -vr vendor/zkcloudworker-lib/dist/* dist/  || echo skip
+    - run: cp -vr vendor/o1js/dist/* dist/ || echo skip
       
     - run: |
         node --prof --heap-prof --cpu-prof --expose-gc --enable-source-maps --stack-trace-limit=1000 ./node_modules/.bin/jest --runInBand --logHeapUsage || echo skip fail
