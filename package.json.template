@@ -24,7 +24,7 @@
     "puppeteer-extra": "^3.3.6",
     "puppeteer-extra-plugin-stealth": "^2.11.2",
     "rss-parser": "^3.13.0",
-    "zkcloudworker": "^0.14.9"
+
   },
   "jest": {
     "preset": "ts-jest",
