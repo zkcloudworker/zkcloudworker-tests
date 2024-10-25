@@ -1,0 +1,186 @@
+
+#+begin_src shell
+ls
+#+end_src
+
+#+RESULTS:
+| #hist.txt#                                                                                                               |
+| 20.xgit-https---github-com--pa-ic-o1js-git-52773246910225cd15d08d5f7b11bd3996bf14b3-perf.data.tar.gz                     |
+| 20.xgit-https---github-com-Ressac-No1-o1js-ZKADS-exte-sio--git-59a6c584e8024ec46ac18acc8e43ee125009b36d-perf.data.tar.gz |
+| 20.xgit-https---github-com-Ressac-No1-o1js-ZKADS-exte-sio--git-eb56a567f006f1d6aa9fb2254cfa5c12dfd92e8c-perf.data.tar.gz |
+| 20.xgit-https---github-com-dfstio-o1js-git-59a6c584e8024ec46ac18acc8e43ee125009b36d-perf.data.tar.gz                     |
+| 20.xgit-https---github-com-k-zysztofwujs-o1js-git-0f8ff810237102d26071c8f2b8fb49d0e5d252e3-perf.data.tar.gz              |
+| 20.xgit-https---github-com-o1-labs-o1js-git-4fcd62cdde9fda32416b7d29c51e6cf52d3c8d8f-perf.data.tar.gz                    |
+| 20.xgit-https---github-com-o1-labs-o1js-git-5e5b8423b5a7ff5e1005551cc2aaea182b9f2a9c-perf.data.tar.gz                    |
+| 20.xgit-https---github-com-o1-labs-o1js-git-fcd6ebf0799a078b26abcbaf26ba9071182d1f82-perf.data.tar.gz                    |
+| 20.xgit-https---github-com-zksecu-ity-o1js-git-4c605ff3e7d010ac109cfecdd664a52f1ec4e5c6-perf.data.tar.gz                 |
+| 20.xgit-https---github-com-zksecu-ity-o1js-git-ee527961c427d43ea709fce9a0fc3b56c0db3d72-perf.data.tar.gz                 |
+| LICENSE                                                                                                                  |
+| README.md                                                                                                                |
+| act.sh                                                                                                                   |
+| act.sh~                                                                                                                  |
+| addresses.json                                                                                                           |
+| cache                                                                                                                    |
+| cache-full                                                                                                               |
+| flame.sh                                                                                                                 |
+| hist.txt                                                                                                                 |
+| isolate-0x6b2fd40-1792793-v8.log                                                                                         |
+| isolate-0x771cd40-1792730-v8.log                                                                                         |
+| jest-config.ts                                                                                                           |
+| json                                                                                                                     |
+| list-versions.py                                                                                                         |
+| node_modules                                                                                                             |
+| o1js                                                                                                                     |
+| package-lock.json                                                                                                        |
+| package.json                                                                                                             |
+| package.json.template                                                                                                    |
+| run_doctor.sh                                                                                                            |
+| runtest.sh                                                                                                               |
+| src                                                                                                                      |
+| test-env.json                                                                                                            |
+| tests                                                                                                                    |
+| tsconfig.json                                                                                                            |
+| yarn.lock                                                                                                                |
+
+#+begin_src shell
+gh run list
+#+end_src
+
+#+RESULTS:
+| completed | success         | showdown                                                        | Node.js CI | feature/other-branches | push | 11488972499 | 3h8m48s | 2024-10-23T22:14:01Z |
+| completed | success         | removing duplicate                                              | Node.js CI | feature/other-branches | push | 11488909357 | 43m8s   | 2024-10-23T22:08:27Z |
+| completed | failure         | adding more versions and making sure they have .git in the name | Node.js CI | feature/other-branches | push | 11488796031 | 5m29s   | 2024-10-23T21:59:17Z |
+| completed | failure         | adding more tests                                               | Node.js CI | feature/other-branches | push | 11488738931 | 1m10s   | 2024-10-23T21:53:22Z |
+| completed | failure         | forcing shallow                                                 | Node.js CI | feature/other-branches | push | 11488501062 | 3m44s   | 2024-10-23T21:32:50Z |
+| completed | failure         | recommend shallow?                                              | Node.js CI | feature/other-branches | push | 11488434855 | 3m46s   | 2024-10-23T21:27:47Z |
+| completed | cancelled       | copy the dist over                                              | Node.js CI | feature/other-branches | push | 11488400438 | 35s     | 2024-10-23T21:25:08Z |
+| completed | failure         | act                                                             | Node.js CI | feature/other-branches | push | 11488281010 | 3m54s   | 2024-10-23T21:16:10Z |
+| completed | failure         | use ./ to indicat a file                                        | Node.js CI | feature/other-branches | push | 11486644104 | 2m8s    | 2024-10-23T19:16:25Z |
+| completed | failure         | need to run npm install recursivly                              | Node.js CI | feature/other-branches | push | 11485968596 | 2m9s    | 2024-10-23T18:29:56Z |
+| completed | failure         | fix syntax                                                      | Node.js CI | feature/other-branches | push | 11484523563 | 3m30s   | 2024-10-23T16:52:01Z |
+| completed | startup_failure | shellcheck                                                      | Node.js CI | feature/other-branches | push | 11484509887 | 1s      | 2024-10-23T16:51:05Z |
+| completed | success         | install via gitsubmodules                                       | Node.js CI | feature/other-branches | push | 11484437785 | 1m4s    | 2024-10-23T16:46:18Z |
+| completed | success         | install save                                                    | Node.js CI | feature/other-branches | push | 11483941529 | 57s     | 2024-10-23T16:13:38Z |
+| completed | success         | comment out some tests for speed                                | Node.js CI | feature/other-branches | push | 11483648901 | 55s     | 2024-10-23T15:56:02Z |
+| completed | failure         | fix sed, need single quotes                                     | Node.js CI | feature/other-branches | push | 11483522191 | 1m13s   | 2024-10-23T15:48:19Z |
+| completed | failure         | adding more branches                                            | Node.js CI | feature/other-branches | push | 11483486788 | 1m0s    | 2024-10-23T15:46:04Z |
+| completed | success         | script for running act                                          | Node.js CI | feature/other-branches | push | 11483477300 | 47s     | 2024-10-23T15:45:28Z |
+| completed | success         | lets try splitting into -                                       | Node.js CI | feature/other-branches | push | 11482882018 | 58s     | 2024-10-23T15:12:24Z |
+| completed | failure         | removing + from the filename                                    | Node.js CI | feature/other-branches | push | 11482777444 | 0s      | 2024-10-23T15:06:47Z |
+
+#+begin_src shell
+  cd data
+  gh run download 11488972499
+#+end_src
+
+#+begin_src shell :results verbatim
+  for x in `ls -Sr data/*/perf.data.tar.gz`; do
+      echo $x;
+      Y=$(dirname "${x}")
+      echo $Y
+      pushd $Y
+      tar -xzf perf.data.tar.gz
+      popd
+      #echo "tar -vC ./tmp/results/ -xzf $x "
+  done
+#+end_src
+
+
+
+find data | grep cpuprofile | xargs gron | cut -d= -f2 | sort | uniq -c | sort -n > cpureport1.txt
+
+for x in `find data | grep cpuprofile`; do gron $x | cut -d= -f2 | sort | uniq -c | sort -n; done | sort | uniq -c| sort -n
+
+   5500       1  "prepareExecution";
+   5521       2  "158";
+   5521       2  "node:internal/main/worker_thread";
+   5540       1  "node:internal/streams/operators";
+   5543       1  "createCurveAffine";
+   5563       1  "137";
+   5612       1  "node:stream";
+   5676       1  "GenericJSToWasmWrapper";
+   5684       2  "wrapSafe";
+   5703       1  "Instance";
+   5725       1  "wbg_rayon_start_worker";
+   5737       2  "Module._compile";
+   5737       2  "Module._extensions..js";
+   5737       2  "Module.load";
+   5742       1  "80";
+   5742       1  "module.exports.wbg_rayon_start_worker";
+   5772       1  "node:internal/per_context/messageport";
+   5782       1  "(garbage collector)";
+   5791       1  "(program)";
+   5791       1  "(root)";
+   5791       1  "executeUserEntryPoint";
+
+find data -name \*v8.log -print -exec bash -c "node --prof-process {} > {}.perf.txt 2>&1" \;
+find data -name \*v8.log -print -exec bash -c "node --prof-process --preprocess -j   {} > {}.perf.json 2>&1" \;
+find data -name \*v8.log -print -exec bash -c "node --prof-process --preprocess -j   {} > {}.perf.json" \;
+find data -name \*v8.log -print -exec grep createCurveAffine {}" \;
+
+
+
+#+begin_src shell
+  cd data
+  #gh run view --log 11488972499
+  GH_DEBUG=true  gh run view --log 11488972499
+  gh api https://api.github.com/repos/meta-introspector/zkcloudworker-tests/actions/runs/11488972499/logs > logs.zip
+#+end_src
+
+#+RESULTS:
+| View                | a             | summary           | of           | a                             | workflow       | run.        |             |                   |            |              |         |               |             |
+|                     |               |                   |              |                               |                |             |             |                   |            |              |         |               |             |
+| This                | command       | does              | not          | support                       | authenticating | via         | fine        | grained           | PATs       |              |         |               |             |
+| as                  | it            | is                | not          | currently                     | possible       | to          | create      | a                 | PAT        | with         | the     | `checks:read` | permission. |
+|                     |               |                   |              |                               |                |             |             |                   |            |              |         |               |             |
+| For                 | more          | information       | about        | output                        | formatting     | flags,      | see         | `gh               | help       | formatting`. |         |               |             |
+|                     |               |                   |              |                               |                |             |             |                   |            |              |         |               |             |
+| USAGE               |               |                   |              |                               |                |             |             |                   |            |              |         |               |             |
+| gh                  | run           | view              | [<run-id>]   | [flags]                       |                |             |             |                   |            |              |         |               |             |
+|                     |               |                   |              |                               |                |             |             |                   |            |              |         |               |             |
+| FLAGS               |               |                   |              |                               |                |             |             |                   |            |              |         |               |             |
+| -a,                 | --attempt     | uint              | The          | attempt                       | number         | of          | the         | workflow          | run        |              |         |               |             |
+| --exit-status       | Exit          | with              | non-zero     | status                        | if             | run         | failed      |                   |            |              |         |               |             |
+| -j,                 | --job         | string            | View         | a                             | specific       | job         | ID          | from              | a          | run          |         |               |             |
+| -q,                 | --jq          | expression        | Filter       | JSON                          | output         | using       | a           | jq                | expression |              |         |               |             |
+| --json              | fields        | Output            | JSON         | with                          | the            | specified   | fields      |                   |            |              |         |               |             |
+| --log               | View          | full              | log          | for                           | either         | a           | run         | or                | specific   | job          |         |               |             |
+| --log-failed        | View          | the               | log          | for                           | any            | failed      | steps       | in                | a          | run          | or      | specific      | job         |
+| -t,                 | --template    | string            | Format       | JSON                          | output         | using       | a           | Go                | template;  | see          | "gh     | help          | formatting" |
+| -v,                 | --verbose     | Show              | job          | steps                         |                |             |             |                   |            |              |         |               |             |
+| -w,                 | --web         | Open              | run          | in                            | the            | browser     |             |                   |            |              |         |               |             |
+|                     |               |                   |              |                               |                |             |             |                   |            |              |         |               |             |
+| INHERITED           | FLAGS         |                   |              |                               |                |             |             |                   |            |              |         |               |             |
+| --help              | Show          | help              | for          | command                       |                |             |             |                   |            |              |         |               |             |
+| -R,                 | --repo        | [HOST/]OWNER/REPO | Select       | another                       | repository     | using       | the         | [HOST/]OWNER/REPO | format     |              |         |               |             |
+|                     |               |                   |              |                               |                |             |             |                   |            |              |         |               |             |
+| JSON                | FIELDS        |                   |              |                               |                |             |             |                   |            |              |         |               |             |
+| attempt,            | conclusion,   | createdAt,        | databaseId,  | displayTitle,                 | event,         | headBranch, |             |                   |            |              |         |               |             |
+| headSha,            | jobs,         | name,             | number,      | startedAt,                    | status,        | updatedAt,  | url,        |                   |            |              |         |               |             |
+| workflowDatabaseId, | workflowName  |                   |              |                               |                |             |             |                   |            |              |         |               |             |
+|                     |               |                   |              |                               |                |             |             |                   |            |              |         |               |             |
+| EXAMPLES            |               |                   |              |                               |                |             |             |                   |            |              |         |               |             |
+| #                   | Interactively | select            | a            | run                           | to             | view,       | optionally  | selecting         | a          | single       | job     |               |             |
+| $                   | gh            | run               | view         |                               |                |             |             |                   |            |              |         |               |             |
+|                     |               |                   |              |                               |                |             |             |                   |            |              |         |               |             |
+| #                   | View          | a                 | specific     | run                           |                |             |             |                   |            |              |         |               |             |
+| $                   | gh            | run               | view         | 12345                         |                |             |             |                   |            |              |         |               |             |
+|                     |               |                   |              |                               |                |             |             |                   |            |              |         |               |             |
+| #                   | View          | a                 | specific     | run                           | with           | specific    | attempt     | number            |            |              |         |               |             |
+| $                   | gh            | run               | view         | 12345                         | --attempt      | 3           |             |                   |            |              |         |               |             |
+|                     |               |                   |              |                               |                |             |             |                   |            |              |         |               |             |
+| #                   | View          | a                 | specific     | job                           | within         | a           | run         |                   |            |              |         |               |             |
+| $                   | gh            | run               | view         | --job                         | 456789         |             |             |                   |            |              |         |               |             |
+|                     |               |                   |              |                               |                |             |             |                   |            |              |         |               |             |
+| #                   | View          | the               | full         | log                           | for            | a           | specific    | job               |            |              |         |               |             |
+| $                   | gh            | run               | view         | --log                         | --job          | 456789      |             |                   |            |              |         |               |             |
+|                     |               |                   |              |                               |                |             |             |                   |            |              |         |               |             |
+| #                   | Exit          | non-zero          | if           | a                             | run            | failed      |             |                   |            |              |         |               |             |
+| $                   | gh            | run               | view         | 451                           | --exit-status  | &&          | echo        | "run              | pending    | or           | passed" |               |             |
+|                     |               |                   |              |                               |                |             |             |                   |            |              |         |               |             |
+| LEARN               | MORE          |                   |              |                               |                |             |             |                   |            |              |         |               |             |
+| Use                 | `gh           | <command>         | <subcommand> | --help`                       | for            | more        | information | about             | a          | command.     |         |               |             |
+| Read                | the           | manual            | at           | https://cli.github.com/manual |                |             |             |                   |            |              |         |               |             |
+| Learn               | about         | exit              | codes        | using                         | `gh            | help        | exit-codes` |                   |            |              |         |               |             |
+|                     |               |                   |              |                               |                |             |             |                   |            |              |         |               |             |
+

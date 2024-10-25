@@ -1,0 +1,10 @@
+{
+    "BLOCKBERRY_API" :"SKIP",
+    "DISCORD_TOKEN": "SKIP",
+    "TEST_ACCOUNTS" : [{"privateKey":"NA","publicKey":"NA"}],
+    "CELESTIA_AUTH_TOKEN":"SKIP",
+    "CHATGPT_TOKEN":"NA",
+    "IPINFO_TOKEN" :"NA",
+    "GASTANKS":[{"privateKey":"NA","publicKey":"NA"}],
+    "GASTANKS_NFT":"SKIP"
+}
