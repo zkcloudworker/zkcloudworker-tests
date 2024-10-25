@@ -3,7 +3,7 @@ name: Node.js CI
 on:
   workflow_dispatch:
   push:
-    branches: [ "main","feature/multi-o1js", "feature/other-branches" ]
+    #branches: [ "main","feature/multi-o1js", "feature/other-branches" ]
   pull_request:
     branches: [ "main" ]
 
