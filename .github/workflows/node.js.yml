@@ -1,0 +1,138 @@
+name: Node.js CI
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ "main","feature/multi-o1js", "feature/other-branches" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+
+        # here are the tests that returned 32 results
+        o1js-version:
+          - "git+https://github.com/Ressac-No1/o1js-ZKADS-extension.git#59a6c584e8024ec46ac18acc8e43ee125009b36d" #Sat Oct  5 14:57:43 2024 17 Ressac-No1/main
+          - "git+https://github.com/Ressac-No1/o1js-ZKADS-extension.git#5e67f233af4ad1212d7be4208127b81790952dc6" #Mon Oct  7 07:03:19 2024 16 Ressac-No1/feature/blake2b
+          - "git+https://github.com/Ressac-No1/o1js-ZKADS-extension.git#74121af790d7a0978b93afa8914a3f0b7bed72a7" #Wed Sep 25 18:39:22 2024 27 Ressac-No1/develop
+          - "git+https://github.com/Ressac-No1/o1js-ZKADS-extension.git#7a0c8f6222b1522080a7efcfef82c64bf38842e5" #Fri Oct  4 19:32:06 2024 18 Ressac-No1/brian/permisions-precondition
+          - "git+https://github.com/Ressac-No1/o1js-ZKADS-extension.git#bc27bc376e0bf5ae096c0c5ad13098539b373326" #Tue Oct  1 00:06:12 2024 22 Ressac-No1/release/v1.8.1
+          - "git+https://github.com/Ressac-No1/o1js-ZKADS-extension.git#bf0e09e61461e05c1fc6e8a617343d1623bdae7f" #Tue Oct  1 16:11:37 2024 21 Ressac-No1/2024-09-refactor-offchain-state
+          - "git+https://github.com/dfstio/o1js.git#59a6c584e8024ec46ac18acc8e43ee125009b36d" #Sat Oct  5 14:57:43 2024 17 dfstio/main
+          - "git+https://github.com/dfstio/o1js.git#8dfd13ee65cbdafe2009dc98f635d555560c3501" #Mon Oct  7 16:07:42 2024 15 dfstio/export-indexed-merkle-map-base
+          - "git+https://github.com/krzysztofwujs/o1js.git#0f8ff810237102d26071c8f2b8fb49d0e5d252e3" #Thu Oct 10 13:21:42 2024 13 krzysztofwujs/main
+          - "git+https://github.com/krzysztofwujs/o1js.git#2ad7b592b18102412674395095dcc72934a56251" #Tue Oct 15 01:20:55 2024 8 krzysztofwujs/release/v1.8.1
+          - "git+https://github.com/o1-labs/o1js.git#3634cdd14a0170c3874abc7f42dacc7ac38f21a4" #Thu Oct 17 18:28:41 2024 5 origin/brian/permisions-precondition
+          - "git+https://github.com/o1-labs/o1js.git#4e1f855f6314ace8e1c16929531d5ccb3e7f9876" #Wed Oct 16 13:39:30 2024 6 origin/meta/setup-codeowners
+          - "git+https://github.com/o1-labs/o1js.git#6eb17094635175d0f817812a0f1c8fd208a70562" #Fri Oct 11 13:59:57 2024 11 origin/chunking-mvp-bug
+          - "git+https://github.com/o1-labs/o1js.git#729f550a2be0df65d8b7db4d1a062e89b33d27b7" #Fri Oct 18 12:46:10 2024 5 origin/feature/lookup-runtime-tables
+          - "git+https://github.com/o1-labs/o1js.git#74121af790d7a0978b93afa8914a3f0b7bed72a7" #Wed Sep 25 18:39:22 2024 27 origin/develop
+          - "git+https://github.com/o1-labs/o1js.git#8d856e67994934a10b6e3d40d689b7b08904d660" #Mon Oct 21 14:49:37 2024 1 origin/release/v1.9.1
+          - "git+https://github.com/o1-labs/o1js.git#ad774e191a5331f3106bf704e277dc33109e625c" #Mon Oct 21 15:47:17 2024 1 origin/v1
+          - "git+https://github.com/o1-labs/o1js.git#fa3e1ef0bdde2960fc8ddf0334e26ebb77b1fe4a"  #Sat Oct 19 13:58:39 2024 3 origin/2024-10-bugfix-lb-performance
+          - "git+https://github.com/o1-labs/o1js.git#fcd6ebf0799a078b26abcbaf26ba9071182d1f82" #Fri Oct 18 12:47:21 2024 5 origin/feature/dynamic-arrays
+          - "git+https://github.com/rpanic/o1js.git#52773246910225cd15d08d5f7b11bd3996bf14b3" #Thu Oct  3 13:50:54 2024 19 rpanic/main
+          - "git+https://github.com/rpanic/o1js.git#ca9bb8855bd3061877e61ff87ae6a51096010e16" #Fri Oct  4 07:41:20 2024 19 rpanic/rpanic/expose-dummy-vk
+          - "git+https://github.com/rpanic/o1js.git#d75cf6cb6928c85e6323728e577c2f031f7fde25" #Thu Oct 10 11:33:31 2024 13 rpanic/fix/state-fetch-token
+          - "git+https://github.com/rpanic/o1js.git#f842f7b603fa04c182bee6fc0b0ecdd3329718dd" #Tue Oct 15 01:41:35 2024 8 rpanic/release/v1.8.1
+          - "git+https://github.com/zksecurity/o1js.git#4c605ff3e7d010ac109cfecdd664a52f1ec4e5c6" #Thu Oct 10 11:58:27 2024 13 zksecurity/zksecurity-ci
+          - "git+https://github.com/zksecurity/o1js.git#de4ade3644c24899a03d7d55386abe633bdab899" #Wed Oct 16 13:46:14 2024 6 zksecurity/main
+          - "git+https://github.com/zksecurity/o1js.git#e94bb7e4ef2283ac285beaedfb498243a47c851f" #Fri Oct 11 19:35:25 2024 11 zksecurity/fix/package-size
+          - "git+https://github.com/zksecurity/o1js.git#ee527961c427d43ea709fce9a0fc3b56c0db3d72" #Fri Oct 11 15:05:32 2024 11 zksecurity/feature/provable-proofs-4
+          - "git+https://github.com/zksecurity/o1js.git#f7ac92e752af8d44c37b649017a08ce5aa6b8760" #Thu Oct 10 19:48:51 2024 12 zksecurity/experiment/uint8-value
+          - "git+https://github.com/GACWR/o1js.git#74121af790d7a0978b93afa8914a3f0b7bed72a7" #Wed Sep 25 18:39:22 2024 27 GACWR/main
+
+        node-version: [
+        #  18.x
+        20.x
+#        , 21.x
+#        , 22.x
+        ]
+        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
+
+    steps:
+    - uses: meta-introspector/checkout@v4
+
+    - name: Sets clean version name
+      env:
+        O1JS_VERSION: ${{ matrix.o1js-version }}
+      run: |
+        #!/bin/bash
+        #remove Double quote ", Colon :, Less than <, Greater than >, Vertical bar |, Asterisk *, Question mark ?, Carriage return \r, Line feed \n, Backslash \, Forward slash /
+        MODIFIED_O1JS_VERSION=${O1JS_VERSION//[\+\"\<\>\|\*\?\r\n\/\:\.\#\/]/-}
+        O1JS_REPO=$(echo "${O1JS_VERSION}" | cut -d/ -f4-5 | cut -d. -f1)
+        O1JS_REF=$(echo "${O1JS_VERSION}" | cut -d# -f2)
+        echo "MODIFIED_O1JS_VERSION=${MODIFIED_O1JS_VERSION}"
+        echo "MODIFIED_O1JS_VERSION=${MODIFIED_O1JS_VERSION}" >> "$GITHUB_ENV"
+        echo "O1JS_REPO=${O1JS_REPO}" >> "$GITHUB_ENV"
+        echo "O1JS_REF=${O1JS_REF}" >> "$GITHUB_ENV"
+    - uses: meta-introspector/checkout@v4
+      with:
+        repository : ${{ env.O1JS_REPO }}
+        ref : ${{ env.O1JS_REF }}
+        path: vendor/o1js
+        #submodules: recursive
+    # now build and install the submodule
+
+    - run: |
+        git submodule init
+        git config -f .gitmodules submodule.src/mina.shallow true
+        git config -f .gitmodules submodule.src/o1js-bindings.shallow true
+        GIT_LFS_SKIP_SMUDGE=1 git submodule update --recursive --force --recommend-shallow
+        npm install # get the reqs
+        npm ci
+        npm run build || echo skip errors on build
+        
+      working-directory: vendor/o1js
+
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: meta-introspector/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+    # replace the version number
+
+    #- run: sed -e's!O1JSVERSION!${{ matrix.o1js-version }}!g' package.json.template> package.json
+    # copy the template without the o1js version in there
+    - run: cp package.json.template package.json
+    - run: cp test-env.json  env.json
+
+    # install the built version from subdir
+    - run: npm install --save --force ./vendor/o1js/
+    - run: npm install --force
+#        rm -rf node_modules
+#        npm cache clean --force
+#        npm install
+    - run: npm ci --force
+    - run: npm run build --if-present || echo skip error
+    - run: npm ls
+      # copy the recursive build down
+    - run: cp -vr vendor/o1js/dist/* dist/
+    - run: |
+        node --prof --heap-prof --cpu-prof --expose-gc --enable-source-maps --stack-trace-limit=1000 ./node_modules/.bin/jest --runInBand --logHeapUsage || echo skip fail
+    - name: list
+      run: ls -latr
+    - name: list
+      run: find .
+    - name: mkdir profile
+      run: mkdir ./profile
+    - name: move2
+      run: |
+        mv isolate-*-v8.log  ./profile || echo ok
+        mv  Heap.*.heapprofile ./profile || echo ok
+        mv  CPU.*.cpuprofile ./profile || echo ok
+
+    - name: archive the results
+      run: tar -czf perf.data.tar.gz ./profile/
+
+
+    - name: Archive results
+      uses: meta-introspector/upload-artifact@v4
+      with:
+        name: ${{ matrix.node-version }}${{ env.MODIFIED_O1JS_VERSION }}-perf.data.tar.gz
+        path: perf.data.tar.gz
