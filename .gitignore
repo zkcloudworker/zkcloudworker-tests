@@ -10,3 +10,4 @@ cache-minimal/
 .pnp.loader.mjs
 .vscode/
 .zkcloudworker/
+addresses.json

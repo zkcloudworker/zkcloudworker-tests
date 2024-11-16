@@ -3,13 +3,14 @@ import { getZkAppTxFromBlockberry } from "../src/blockberry-zkapp";
 import fs from "fs/promises";
 
 const hash = "5JvQtGB1pShSNmj4B7x2W4eLtitAY9STZxqezHzRyru1r5N1kXin";
+//"5JuEaWqCkiizzjA3mjrva5hjYeohiGKQFcffUdZxrEJM4xDirhK1";
 describe("Transaction", () => {
   it(`should get the transaction`, async () => {
     const zkapp = await getZkAppTxFromBlockberry({
       hash,
       chain: "devnet",
     });
-    //console.log("zkapp txs:", zkapp);
+    console.log("zkapp txs:", zkapp);
     await fs.writeFile(`${hash}.json`, JSON.stringify(zkapp, null, 2));
   });
 });

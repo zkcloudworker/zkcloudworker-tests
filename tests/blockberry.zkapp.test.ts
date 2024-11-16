@@ -7,6 +7,6 @@ describe("Transaction", () => {
     const zkapp = await getZkAppFromBlockberry({
       account: "B62qnzkHunByjReoEwMKCJ9HQxZP2MSYcUe8Lfesy4SpufxWp3viNFT",
     });
-    console.log("zkapp:", zkapp.verificationKeyHash);
+    console.log("zkapp:", zkapp);
   });
 });

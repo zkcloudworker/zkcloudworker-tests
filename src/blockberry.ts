@@ -1,6 +1,5 @@
 import { BLOCKBERRY_API } from "../env.json";
 
-
 export async function getTransactionFromBlockberry(params: {
   hash: string;
 }): Promise<any> {
@@ -9,7 +8,7 @@ export async function getTransactionFromBlockberry(params: {
     method: "GET",
     headers: {
       accept: "application/json",
-      "x-api-key": "CqSGrmsynz6bHJW6hzSRqokwKGKqGU",
+      "x-api-key": BLOCKBERRY_API,
     },
   };
 

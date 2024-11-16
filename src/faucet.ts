@@ -10,7 +10,7 @@ export async function faucet(params: {
   //console.log("faucet params:", params);
 
   try {
-    const faucetResponse = await fetch(faucetUrl, {
+    const response = await fetch(faucetUrl, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -19,17 +19,24 @@ export async function faucet(params: {
         address: publicKey,
       }),
     });
-    //console.log("faucet response:", faucetResponse);
-    const result = await faucetResponse.text();
-    //console.log("faucet result:", result);
-    return {
-      error: null,
-      result,
-    };
-  } catch (error) {
+    if (!response.ok) {
+      const result = await response.text();
+      console.log("error response", result);
+      return {
+        success: false,
+        status: response.status,
+        error: response.statusText,
+        result,
+      };
+    }
+    const result = await response.text();
+    console.log("Faucet result", result);
+    return { success: true, result };
+  } catch (error: any) {
     console.error("faucet error:", error);
     return {
-      error: "Maximum allowed withdrawls exceeded.",
+      success: false,
+      error: "faucet error " + (error?.message ?? ""),
     };
   }
 }

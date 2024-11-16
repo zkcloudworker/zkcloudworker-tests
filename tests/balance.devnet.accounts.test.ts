@@ -1,8 +1,8 @@
 import { describe, expect, it } from "@jest/globals";
 import { accountBalanceMina, initBlockchain } from "zkcloudworker";
 import { PublicKey, Mina, TokenId, PrivateKey } from "o1js";
-import { TEST_ACCOUNTS } from "../env.json";
-
+//import { TEST_ACCOUNTS } from "../env.json";
+import TEST_ACCOUNTS from "../addresses.json";
 describe("Balances", () => {
   it(`should get the balances`, async () => {
     await initBlockchain("devnet");

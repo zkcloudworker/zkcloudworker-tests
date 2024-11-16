@@ -8,17 +8,33 @@ import {
   IncludedTransaction,
   RejectedTransaction,
   PendingTransaction,
+  SmartContract,
+  method,
+  state,
+  State,
 } from "o1js";
 import {
   accountBalanceMina,
   blockchain,
   initBlockchain,
   sleep,
-  TinyContract,
 } from "zkcloudworker";
 import { TEST_ACCOUNTS } from "../env.json";
 
-const COUNT = 1000;
+export class TinyContract extends SmartContract {
+  @state(Field) value = State<Field>();
+
+  events = {
+    valueSet: Field,
+  };
+
+  @method async setValue(value: Field) {
+    this.value.set(value);
+    this.emitEvent("valueSet", value);
+  }
+}
+
+const COUNT = 10;
 const chain = "zeko" as blockchain;
 
 let sender: Mina.TestPublicKey = Mina.TestPublicKey.fromBase58(
@@ -27,7 +43,12 @@ let sender: Mina.TestPublicKey = Mina.TestPublicKey.fromBase58(
 
 describe("Zeko", () => {
   it("should compile", async () => {
-    await initBlockchain("zeko");
+    //await initBlockchain("zeko");
+    const networkInstance = Mina.Network({
+      mina: "https://devnet.zeko.io/graphql",
+      archive: "https://devnet.zeko.io/graphql",
+    });
+    Mina.setActiveInstance(networkInstance);
     console.log("sender", sender.toBase58());
     console.log("Sender's balance:", await accountBalanceMina(sender));
     const cache: Cache = Cache.FileSystem("./cache");
@@ -68,6 +89,8 @@ describe("Zeko", () => {
         console.log(`${i}:`, Number(value.toBigInt()));
         if (value.toBigInt() !== BigInt(i))
           console.error("value is not correct");
+        const events = await zkApp.fetchEvents();
+        console.log("events", events);
       } catch (e) {
         console.log(e);
       }

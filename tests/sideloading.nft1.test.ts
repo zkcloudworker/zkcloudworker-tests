@@ -63,6 +63,21 @@ class NFTState extends Struct({
   owner: PublicKey,
   version: UInt32,
 }) {
+  constructor(props: NFTState) {
+    super({
+      ...props,
+      immutableState: {
+        ...props.immutableState,
+        creator: props.immutableState.creator as Readonly<PublicKey>,
+        canChangeOwner: props.immutableState.canChangeOwner as Readonly<Bool>,
+        nftAddress: props.immutableState.nftAddress as Readonly<PublicKey>,
+        tokenId: props.immutableState.tokenId as Readonly<Field>,
+      },
+      metadata: props.metadata as Readonly<Field>,
+      owner: props.owner as Readonly<PublicKey>,
+      version: props.version as Readonly<UInt32>,
+    });
+  }
   static assertEqual(a: NFTState, b: NFTState) {
     NFTImmutableState.assertEqual(a.immutableState, b.immutableState);
     a.metadata.assertEquals(b.metadata);
@@ -103,6 +118,7 @@ const nftProgram = ZkProgram({
         vk: VerificationKey
       ) {
         proof.verify(vk);
+        NFTState.assertEqual(initialState, proof.publicInput);
         return new NFTState({
           immutableState: initialState.immutableState,
           metadata: initialState.metadata,
@@ -163,13 +179,11 @@ export class NFTContract extends SmartContract {
     this.canChangeOwner.set(props.canChangeOwner);
   }
 
-  @method async updateMetadata(proof: NativeNFTProof) {
-    // , vk: VerificationKey
-    // this.metadataVerificationKeyHash
-    //   .getAndRequireEquals()
-    //   .assertEquals(vk.hash);
-    // proof.verify(vk);
-    proof.verify();
+  @method async updateMetadata(proof: SideLoadedNFTProof, vk: VerificationKey) {
+    this.metadataVerificationKeyHash
+      .getAndRequireEquals()
+      .assertEquals(vk.hash);
+    proof.verify(vk);
 
     const version = this.version.getAndRequireEquals();
     // recursive proofs can increase the version by more than 1
@@ -218,7 +232,7 @@ const pluginProgram = ZkProgram({
     },
   },
 });
-const chain = "local" as blockchain;
+const chain = "devnet" as blockchain;
 let tinyContractVk: VerificationKey;
 let nftContractVk: VerificationKey;
 let nftProgramVk: VerificationKey;
@@ -339,6 +353,7 @@ describe("NFT with Side loading verification key", () => {
   it("should deploy a SmartContract", async () => {
     Memory.info("before deploy");
     console.time("deployed");
+    await fetchMinaAccount({ publicKey: sender, force: true });
     const tx = await Mina.transaction(
       { sender, fee: 100_000_000 },
       async () => {
@@ -357,8 +372,11 @@ describe("NFT with Side loading verification key", () => {
   });
 
   it("should change owner", async () => {
-    await fetchMinaAccount({ publicKey: zkAppKey, force: true });
+    if (chain !== "local") {
+      await sleep(10000);
+    }
     Memory.info("before change owner");
+    await fetchMinaAccount({ publicKey: zkAppKey, force: true });
     const initialState = new NFTState({
       immutableState,
       metadata: nftContract.metadata.get(),
@@ -400,6 +418,7 @@ describe("NFT with Side loading verification key", () => {
       console.timeEnd("change owner proof generated");
     }
     // merge all proofs into one
+    console.time("merged proofs");
     let mergedProof: NativeNFTProof = proofs[0];
     for (let i = 1; i < proofs.length; i++) {
       mergedProof = await nftProgram.merge(
@@ -408,19 +427,20 @@ describe("NFT with Side loading verification key", () => {
         proofs[i]
       );
     }
+    console.timeEnd("merged proofs");
     const changeOwnerProof = SideLoadedNFTProof.fromProof(mergedProof);
-    console.time("prepare change owner tx");
+    console.time("prepared change owner tx");
     await fetchMinaAccount({ publicKey: zkAppKey, force: true });
     await fetchMinaAccount({ publicKey: sender, force: true });
     const tx = await Mina.transaction(
       { sender, fee: await fee(), memo: "Update metadata" },
       async () => {
-        //await nftContract.updateMetadata(changeOwnerProof, nftProgramVk);
-        await nftContract.updateMetadata(mergedProof);
+        await nftContract.updateMetadata(changeOwnerProof, nftProgramVk);
+        //await nftContract.updateMetadata(mergedProof);
       }
     );
     await tx.prove();
-    console.timeEnd("prepare change owner tx");
+    console.timeEnd("prepared change owner tx");
     const txIncluded = await (await tx.sign([sender.key]).send()).wait();
     console.log("change owner tx:", txIncluded.hash);
     if (chain === "devnet") {
@@ -432,8 +452,12 @@ describe("NFT with Side loading verification key", () => {
     Memory.info("after change owner");
   });
 
-  it.skip("should update metadata", async () => {
+  it("should update metadata", async () => {
+    if (chain !== "local") {
+      await sleep(10000);
+    }
     console.time("updated metadata");
+    await fetchMinaAccount({ publicKey: zkAppKey, force: true });
     const newMetadata = Field(7);
     const nftInputState = new NFTState({
       immutableState,
@@ -447,15 +471,21 @@ describe("NFT with Side loading verification key", () => {
       nftContract.owner.get()
     );
     const metadataProof = SideLoadedNFTProof.fromProof(proof);
+    await fetchMinaAccount({ publicKey: zkAppKey, force: true });
+    await fetchMinaAccount({ publicKey: sender, force: true });
     const tx = await Mina.transaction(
       { sender, fee: 100_000_000 },
       async () => {
-        //await nftContract.updateMetadata(metadataProof, nftProgramVk);
-        await nftContract.updateMetadata(proof);
+        await nftContract.updateMetadata(metadataProof, nftProgramVk);
+        //await nftContract.updateMetadata(proof);
       }
     );
     await tx.prove();
     await (await tx.sign([sender.key]).send()).wait();
+    if (chain !== "local") {
+      await sleep(10000);
+    }
+    await fetchMinaAccount({ publicKey: zkAppKey, force: true });
     const metadata = nftContract.metadata.get();
     expect(metadata.toJSON()).toBe(newMetadata.toJSON());
     console.timeEnd("updated metadata");
