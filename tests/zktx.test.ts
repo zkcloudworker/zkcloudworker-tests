@@ -4,7 +4,7 @@ import {
   getZkAppFromBlockberry,
   getZkAppTxsFromBlockberry,
   getAllZkAppTxsFromBlockberry,
-} from "../src/blockberry-zkapp";
+} from "../src/blockberry-zkapp.js";
 
 const hash = "5JvS8aNnPYtG5kZXM4HQgrzgQxyvqAnrKNsU6YJ7FMXpBert7JkG";
 //"5JuWEsnFvEzTJ7PuCPdRgXt9wGNGJTBL1V9Z8ecNL24j2YsTMisu";

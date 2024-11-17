@@ -1,0 +1,111 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("POSTGRES_PRISMA_URL")
+  directUrl = env("POSTGRES_URL_NON_POOLING")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum Plan {
+  free
+  premium
+  test
+}
+
+enum Chain {
+  mina_mainnet
+  mina_devnet
+  zeko_mainnet
+  zeko_devnet
+}
+
+model APIKey {
+  address    String  @id
+  email      String  @db.VarChar(255)
+  name       String  @db.VarChar(255)
+  discord    String  @db.VarChar(100)
+  expiry     DateTime
+  createdAt  DateTime @default(now())
+  plan Plan @default(free)
+  chains APIKeyChain[]
+  usage APIKeyUsage[]
+  jobData JobData[] @relation("APIKeyToJobData")
+  @@index([email])
+  @@index([plan])
+  @@index([address])
+  @@index([discord])
+}
+
+model AddressBlacklist {
+  address String @id
+  reason String
+}
+
+model EmailBlacklist {
+  email String @id
+  reason String
+}
+
+model DiscordBlacklist {
+  discord String @id
+  reason String
+}
+
+model APIKeyChain {
+  address String
+  chain Chain
+  @@id([address, chain])
+  activated Boolean
+  apiKey APIKey @relation(fields: [address], references: [address], onDelete: Cascade)
+  @@index([address])
+  @@index([chain])
+  @@index([activated])
+}
+
+model APIKeyUsage {
+  address String
+  chain Chain
+  jobId String
+  @@id([address, chain, jobId])
+  apiKey APIKey @relation(fields: [address], references: [address], onDelete: Cascade)
+  jobData JobData @relation(fields: [jobId], references: [jobId], onDelete: Cascade)
+  @@index([address])
+  @@index([jobId])
+  @@index([chain])
+}
+
+model JobData {
+  jobId String @id 
+  address String?
+  apiKey APIKey? @relation("APIKeyToJobData", fields: [address], references: [address], onDelete: Cascade)
+  apiKeyUsages APIKeyUsage[]
+  id String
+  taskId String?
+  developer String
+  repo String
+  task String?
+  userId String?
+  args String?
+  metadata String?
+  chain Chain
+  filename String?
+  txNumber Int
+  timeCreated DateTime @default(now())
+  timeStarted DateTime?
+  timeFinished DateTime?
+  timeFailed DateTime?
+  timeUsed DateTime?
+  jobStatus String
+  billedDuration Int?
+  result String?
+  logStreams Json?
+  logs String[]
+  isFullLog Boolean?
+  @@index([chain])
+  @@index([jobId])
+  @@index([timeCreated])
+  @@index([jobStatus])
+  @@index([chain, jobStatus])
+}

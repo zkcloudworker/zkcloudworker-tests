@@ -1,7 +1,7 @@
 import { describe, expect, it } from "@jest/globals";
 import { getAccountFromGraphQL, Devnet, sleep } from "zkcloudworker";
-import { TestContract } from "../src/contract";
-import { verifySmartContract } from "../src/vk";
+import { TestContract } from "../src/contract.js";
+import { verifySmartContract } from "../src/vk.js";
 
 describe("Account", () => {
   it(`should get the account`, async () => {
