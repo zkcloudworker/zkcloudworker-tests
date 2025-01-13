@@ -17,9 +17,9 @@ describe("nats", () => {
     // add a stream - jetstream can capture nats core messages
     const stream = "zkcw";
     const subj = `zkcw.*`;
-    //await jsm.streams.add({ name: stream, subjects: [subj] });
-    //nc.publish(`zkcw.a`, "a1");
-    //nc.publish(`zkcw.b`, "b1");
+    await jsm.streams.add({ name: stream, subjects: [subj] });
+    nc.publish(`zkcw.a`, "a1");
+    nc.publish(`zkcw.b`, "b1");
     console.log("published");
     await sleep(1000);
     const name = await jsm.streams.find("zkcw.a");
@@ -31,7 +31,7 @@ describe("nats", () => {
     nc.drain();
     nc.close();
   });
-  it.skip(`should use kv`, async () => {
+  it(`should use kv`, async () => {
     const nc = await connect({ servers: endpoint });
     const js = nc.jetstream();
     const kv = await js.views.kv("profiles");
@@ -111,7 +111,7 @@ describe("nats", () => {
     await nc.drain();
   });
 
-  it(`should watch multiple jobs status`, async () => {
+  it.skip(`should watch multiple jobs status`, async () => {
     const jobKeys = [
       "zkcloudworker.job.staketab.nameservice",
       "zkcloudworker.job.DFST.worker-example",

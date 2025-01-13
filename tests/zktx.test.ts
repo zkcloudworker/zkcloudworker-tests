@@ -4,9 +4,9 @@ import {
   getZkAppFromBlockberry,
   getZkAppTxsFromBlockberry,
   getAllZkAppTxsFromBlockberry,
-} from "../src/blockberry-zkapp.js";
+} from "../src/blockberry-zkapp";
 
-const hash = "5JvS8aNnPYtG5kZXM4HQgrzgQxyvqAnrKNsU6YJ7FMXpBert7JkG";
+const hash = "5JtsHjSQhZxsdvhxJVDv2JxEVYTLGv9fXVoukbdMEcNdzRBijp2H";
 //"5JuWEsnFvEzTJ7PuCPdRgXt9wGNGJTBL1V9Z8ecNL24j2YsTMisu";
 //"5JvCKtiL6zqdNxN1kdLrRkhz7JGEQRMcsxfW4s4A16tsYGWRqHs6";
 const lastTokenCount = 0;

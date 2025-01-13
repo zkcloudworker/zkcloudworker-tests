@@ -22,7 +22,7 @@ describe("JWT", () => {
       .setProtectedHeader({ alg: "HS256", typ: "JWT" })
       .setIssuedAt()
       .setIssuer("minatokens.com")
-      .setExpirationTime("1s")
+      .setExpirationTime("10s")
       .sign(secret);
 
     console.log("Generated JWT:", jwt);

@@ -1,6 +1,6 @@
 import { Cache, Mina } from "o1js";
-import { FungibleTokenAdmin } from "mina-fungible-token";
-import { verificationKeys } from "../src/vkft";
+import { FungibleTokenAdmin } from "../src/FungibleTokenAdmin.js";
+import { verificationKeys } from "../src/vkft.js";
 
 async function compile() {
   const network = await Mina.LocalBlockchain();

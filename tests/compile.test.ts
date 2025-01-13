@@ -1,5 +1,14 @@
 import { describe, expect, it } from "@jest/globals";
-import { Field, SmartContract, method, state, State, Mina } from "o1js";
+import {
+  Field,
+  SmartContract,
+  method,
+  state,
+  State,
+  Mina,
+  PrivateKey,
+  TokenId,
+} from "o1js";
 
 export class TestContract extends SmartContract {
   @state(Field) value = State<Field>();
@@ -16,5 +25,8 @@ describe("Compile v1", () => {
     Mina.setActiveInstance(Local);
     const vk = (await TestContract.compile()).verificationKey;
     console.log("vk", vk.hash.toJSON());
+    const zkApp = new TestContract(PrivateKey.random().toPublicKey());
+    const tokenId = zkApp.tokenId;
+    console.log("tokenId", TokenId.toBase58(tokenId));
   });
 });
