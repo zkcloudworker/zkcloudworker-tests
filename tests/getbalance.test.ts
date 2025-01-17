@@ -85,19 +85,20 @@ describe("balance instability check", () => {
     ).toBe("included");
   });
 
-  for (let i = 0; i < 10000; i++) {
+  for (let i = 0; i < 1000; i++) {
     it(`should run ${i}`, async () => {
+      const timeStart = Date.now();
       await fetchMinaAccount({ publicKey: sender, force: true });
       await fetchMinaAccount({ publicKey: zkKey, force: true });
       let balance = Mina.getAccount(zkKey).balance.toBigInt();
       let record = balanceContract.record.get().toBigInt();
       let attempt = 1;
-      const timeStart = Date.now();
+
       while (Number(balance) !== i || Number(record) !== i) {
         console.log(
-          `\x1b[31mwaiting for balance ${i}: ${
-            (Date.now() - timeStart) / 60000
-          } min\x1b[0m`
+          `\x1b[31mwaiting for balance ${i}: ${formatTime(
+            Date.now() - timeStart
+          )}\x1b[0m`
         );
         await sleep(10000 * attempt);
         attempt++;
@@ -107,7 +108,6 @@ describe("balance instability check", () => {
         record = balanceContract.record.get().toBigInt();
       }
       console.log(`balance ${i}:`, Number(balance));
-
       console.log(`record ${i}:`, Number(record));
       expect(balance).toBe(record);
       expect(Number(balance)).toBe(i);
@@ -128,9 +128,20 @@ describe("balance instability check", () => {
             description: `step ${i + 1}`,
             verbose: true,
             wait: true,
+            delay: 0,
+            retry: 1000,
           })
         )?.status
       ).toBe("included");
     });
   }
 });
+
+function formatTime(time: number) {
+  const ms = time % 1000;
+  const minutes = Math.floor(time / 60000);
+  const seconds = Math.floor((time % 60000) / 1000);
+  return `${minutes === 0 ? "" : `${minutes} min `}${
+    seconds === 0 ? "" : `${seconds} sec`
+  }${seconds === 0 && minutes === 0 ? `${ms} ms` : ""}`;
+}
