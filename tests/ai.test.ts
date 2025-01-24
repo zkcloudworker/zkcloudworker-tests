@@ -3,8 +3,14 @@ import OpenAI from "openai";
 import { CHATGPT_TOKEN } from "../env.json";
 const openai = new OpenAI({ apiKey: CHATGPT_TOKEN });
 
+let symbol = "STEEL";
+let name = "Mina Steel";
+let description =
+  "MinaSteel is a fungible token central to the ZeroCraft gaming ecosystem, secured on the Mina Protocol. It represents a rare, premium-grade alloy essential for crafting high-tier weapons, fortified armor, and advanced tools. By holding or trading MinaSteel, players gain access to superior forging capabilities, enabling them to advance their in-game standing and strength within ZeroCraft’s competitive landscape.";
+let prompt: string | undefined = undefined;
+
 describe("Stream AI", () => {
-  it(`should list all available OpenAI models`, async () => {
+  it.skip(`should list all available OpenAI models`, async () => {
     const models = await openai.models.list();
     expect(models).toBeDefined();
     expect(models.data).toBeInstanceOf(Array);
@@ -91,6 +97,32 @@ describe("Stream AI", () => {
     } else {
       console.log("No content");
     }
+  });
+
+  it(`should get the image prompt from o1-mini`, async () => {
+    const completion = await openai.chat.completions.create({
+      model: "o1-mini",
+      messages: [
+        {
+          role: "user",
+          content: `You are an great artist and a creator of tokens on Mina protocol that are very popular and engaging. Create a prompt for DALL-E-3 for generation of an image of a token on Mina protocol with symbol ${symbol}, name ${name}, description: ${description}`,
+        },
+      ],
+    });
+    prompt = completion.choices[0].message.content ?? "A cute puppy";
+    console.log("prompt", prompt);
+  });
+
+  it(`should get the image`, async () => {
+    const completion = await openai.images.generate({
+      model: "dall-e-3",
+      prompt:
+        prompt ??
+        `A beautiful image of a token on Mina protocol with symbol ${symbol}, name ${name}`,
+      size: "1024x1024",
+    });
+
+    console.log("image", completion.data[0].url);
   });
 });
 
