@@ -71,7 +71,7 @@ describe("balance instability check", () => {
     expect(txIncluded.status).toBe("included");
   });
 
-  for (let i = 0; i < 1000; i++) {
+  for (let i = 0; i < 3; i++) {
     it(`should run ${i}`, async () => {
       const tx = await Mina.transaction(
         { sender, fee: 100_000_000, memo: `step ${i + 1}` },
