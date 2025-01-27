@@ -54,7 +54,7 @@ describe("balance instability check", () => {
     console.log("sender", sender.toJSON());
     console.log("contract", zkKey.toBase58());
     const tx = await Mina.transaction(
-      { sender, fee: 200_000_000, memo: "balance contract deploy" },
+      { sender, fee: 300_000_000, memo: "balance contract deploy" },
       async () => {
         AccountUpdate.fundNewAccount(sender);
         await balanceContract.deploy({});
