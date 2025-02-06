@@ -31,7 +31,7 @@ describe("nats", () => {
     nc.drain();
     nc.close();
   });
-  it(`should use kv`, async () => {
+  it.skip(`should use kv`, async () => {
     const nc = await connect({ servers: endpoint });
     const js = nc.jetstream();
     const kv = await js.views.kv("profiles");
@@ -111,10 +111,11 @@ describe("nats", () => {
     await nc.drain();
   });
 
-  it.skip(`should watch multiple jobs status`, async () => {
+  it(`should watch multiple jobs status`, async () => {
     const jobKeys = [
       "zkcloudworker.job.staketab.nameservice",
       "zkcloudworker.job.DFST.worker-example",
+      "zkcloudworker.job.DFST.token-launchpad",
       // Add more job keys as needed
     ];
 

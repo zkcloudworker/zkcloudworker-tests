@@ -1,12 +1,14 @@
 import { describe, expect, it } from "@jest/globals";
 import OpenAI from "openai";
-import { CHATGPT_TOKEN } from "../env.json";
+// @ts-ignore-next-line
+import env from "../env.json";
+const { CHATGPT_TOKEN } = env;
 const openai = new OpenAI({ apiKey: CHATGPT_TOKEN });
 
 let symbol = "STEEL";
 let name = "Mina Steel";
 let description =
-  "MinaSteel is a fungible token central to the ZeroCraft gaming ecosystem, secured on the Mina Protocol. It represents a rare, premium-grade alloy essential for crafting high-tier weapons, fortified armor, and advanced tools. By holding or trading MinaSteel, players gain access to superior forging capabilities, enabling them to advance their in-game standing and strength within ZeroCraft’s competitive landscape.";
+  "MinaSteel is a fungible token central to the ZeroCraft gaming ecosystem, secured on the Mina Protocol. It represents a rare, premium-grade alloy essential for crafting high-tier weapons, fortified armor, and advanced tools. By holding or trading MinaSteel, players gain access to superior forging capabilities, enabling them to advance their in-game standing and strength within ZeroCraft's competitive landscape.";
 let prompt: string | undefined = undefined;
 
 describe("Stream AI", () => {
@@ -101,7 +103,7 @@ describe("Stream AI", () => {
 
   it(`should get the image prompt from o1-mini`, async () => {
     const completion = await openai.chat.completions.create({
-      model: "o1-mini",
+      model: "o3-mini",
       messages: [
         {
           role: "user",
@@ -113,7 +115,7 @@ describe("Stream AI", () => {
     console.log("prompt", prompt);
   });
 
-  it(`should get the image`, async () => {
+  it.skip(`should get the image`, async () => {
     const completion = await openai.images.generate({
       model: "dall-e-3",
       prompt:

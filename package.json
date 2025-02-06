@@ -4,7 +4,7 @@
   "author": "DFST",
   "type": "module",
   "scripts": {
-    "test": "jest",
+    "test": "jest --module=nodenext",
     "tx": "jest zktx",
     "prisma:generate": "yarn prisma generate",
     "prisma:seed": "yarn prisma db seed",

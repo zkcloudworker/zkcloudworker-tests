@@ -32,6 +32,13 @@ const keys: string[] = [
   "B62qjiSaCm7J8xEiZAnn8WVnMxD8L3C9L5Ppys6rnFqxWapUGmKUYcT",
   "B62qpXEssXWC6peuhGZMyhtrSh9BaMCQXoqviEvxKtE8z93woVkyWi9",
   "B62qkWXWcgSnExrcF7iFyioao5WAx3Ayyz3bWMkgQrcAHqkB999eEay",
+  "B62qmKggMTU6TyrEXdCGEakBbsc3EBeypXTWQmpqRA3y88xepXeQm3a",
+  "B62qjFmTAzmLvPXRhUn8H83BoqtQxFtqHe8DkYBrj44TP6uKWWNfa1a",
+  "B62qmoZqbXP3zRDFiVhczH6XXzHN2jhEq6dT9XqZ4trc1Y8oXyCAJgK",
+  "B62qoQ7oMLTHHaW4g2DtRiKbAi41xGWRGhm59A9mof5pVZuUJhwLyUG",
+  "B62qjrWFfTuosipqFV2wrWCPWHo2UHk3sdcJAsvNj61eowfrXBq4X8F",
+  "B62qpiTxGZAc2j82g8DMW2oS4zou3fcDb8meENk9jmjhvrwHDJFbczv",
+  "B62qqqcQrWD18jitNAiF9WnJf7bcrmUabXShYTubKktuGSLyidUhY4U",
 ];
 const addressesToTopup: string[] = [];
 
