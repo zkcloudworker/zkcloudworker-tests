@@ -19,12 +19,6 @@ interface Offer {
   data: string;
 }
 
-const bid: Bid = {
-  id,
-  price: Math.floor(Math.random() * 100),
-  type: "offered",
-};
-
 describe("nats", () => {
   it(`should publish offer and watch bids`, async () => {
     const nc = await connect({ servers: endpoint });
@@ -36,6 +30,38 @@ describe("nats", () => {
   });
 });
 
+async function watchBids(kv: KV, offer: Offer, bidTime: number) {
+  let history = true;
+  if (!offer) {
+    throw new Error("No offer found");
+  }
+  const iter2 = await kv.watch({
+    key: `bids.${offer.id}.>`,
+    initializedFn: () => {
+      history = false;
+    },
+  });
+  for await (const e of iter2) {
+    const bid = JSON.parse(e.string()) as Bid;
+
+    if (bid.type === "accepted") {
+      if (bid.id === id) {
+        const time = Date.now() - bidTime;
+        console.log("accepted in", time, "ms");
+        iter2.stop();
+        return;
+      } else {
+        const time = Date.now() - bidTime;
+        console.log("bid NOT accepted in", time, "ms");
+        iter2.stop();
+        return;
+      }
+    } else {
+      console.log("other bid", bid);
+    }
+  }
+}
+
 async function watchOffers(kv: KV) {
   let history = true;
   const iter = await kv.watch({
@@ -46,43 +72,24 @@ async function watchOffers(kv: KV) {
   });
 
   let bidTime = 0;
-  let offer: Offer | null = null;
 
   for await (const e of iter) {
-    offer = JSON.parse(e.string()) as Offer;
-    // console.log(
-    //   `${history ? "History" : "Updated"} ${e.key} @ ${e.revision} -> `,
-    //   offer
-    // );
+    const offer = JSON.parse(e.string()) as Offer;
+    console.log(
+      `${history ? "History" : "Updated"} ${e.key} @ ${e.revision} -> `,
+      offer
+    );
     if (!history) {
-      //console.log("offer", offer);
+      console.log("offer", offer);
       bidTime = Date.now();
-      await kv.put("bids." + offer.id, JSON.stringify(bid));
-
-      break;
-    }
-  }
-  history = true;
-  if (!offer) {
-    throw new Error("No offer found");
-  }
-  const iter2 = await kv.watch({
-    key: `bids.${offer.id}`,
-    initializedFn: () => {
-      history = false;
-    },
-  });
-  for await (const e of iter2) {
-    const bid = JSON.parse(e.string()) as Bid;
-
-    if (bid.id === id) {
-      if (bid.type === "accepted") {
-        const time = Date.now() - bidTime;
-        console.log("accepted in", time, "ms");
-        return;
-      }
-    } else {
-      console.log("other bid", bid);
+      const bid: Bid = {
+        id,
+        price: Math.floor(Math.random() * 100),
+        type: "offered",
+      };
+      await kv.put("bids." + offer.id + "." + id, JSON.stringify(bid));
+      console.log("my bid", bid);
+      await watchBids(kv, offer, bidTime);
     }
   }
 }
