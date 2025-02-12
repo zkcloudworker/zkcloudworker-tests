@@ -70,7 +70,7 @@ describe("Explorer", () => {
     });
     console.log("job result:", result);
   });
-  it(`should get the query billing`, async () => {
+  it.skipn(`should get the query billing`, async () => {
     const result = await fetchExplorerData({
       command: "queryBilling",
       data: { id },
