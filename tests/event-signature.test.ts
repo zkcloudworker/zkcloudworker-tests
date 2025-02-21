@@ -9,6 +9,10 @@ import {
   State,
   Provable,
   Mina,
+  FlexibleProvablePure,
+  Signature,
+  PublicKey,
+  Struct,
 } from "o1js";
 import {
   blockchain,
@@ -24,15 +28,24 @@ type TestPublicKey = Mina.TestPublicKey;
 const zkKey = TestPublicKey.random();
 import { TEST_ACCOUNTS } from "../env.json";
 // https://minascan.io/devnet/tx/5Jts1zHxi1wfFpc2jf6HicVzwzg2bC6SKV9iCLNAoKHQWzP3vYgc?type=zk-tx
-const chain: blockchain = "zeko" as blockchain;
+const chain: blockchain = "devnet" as blockchain;
 const INCREMENT = UInt64.from(1);
 let sender: TestPublicKey;
+
+class SignatureEvent extends Struct({
+  amount: UInt64,
+  signature: Signature,
+}) {}
 
 class BalanceContract extends SmartContract {
   @state(UInt64) record = State<UInt64>(UInt64.zero);
 
+  events = {
+    "topup-event": SignatureEvent,
+  };
+
   @method
-  public async topup() {
+  public async topup(amount: UInt64, signature: Signature) {
     const balance = this.account.balance.getAndRequireEquals();
     const record = this.record.getAndRequireEquals();
     Provable.log("balance", balance);
@@ -40,9 +53,14 @@ class BalanceContract extends SmartContract {
     balance.assertEquals(record);
     const sender = this.sender.getUnconstrained();
     const senderUpdate = AccountUpdate.createSigned(sender);
-    senderUpdate.balance.subInPlace(INCREMENT);
-    this.balance.addInPlace(INCREMENT);
-    this.record.set(record.add(INCREMENT));
+    signature.verify(sender, [amount.value]).assertTrue();
+    senderUpdate.balance.subInPlace(amount);
+    this.balance.addInPlace(amount);
+    this.record.set(record.add(amount));
+    this.emitEvent("topup-event", {
+      amount,
+      signature,
+    });
   }
 }
 
@@ -50,6 +68,7 @@ const balanceContract = new BalanceContract(zkKey);
 
 describe("balance instability check", () => {
   it(`should compile`, async () => {
+    console.log("Signature.sizeInFields", Signature.sizeInFields());
     const { keys } = await initBlockchain(chain);
     sender =
       chain === "local"
@@ -85,7 +104,7 @@ describe("balance instability check", () => {
     ).toBe("included");
   });
 
-  for (let i = 0; i < 10000; i++) {
+  for (let i = 0; i < 1000; i++) {
     it(`should run ${i}`, async () => {
       const timeStart = Date.now();
       await fetchMinaAccount({ publicKey: sender, force: true });
@@ -112,11 +131,13 @@ describe("balance instability check", () => {
       expect(balance).toBe(record);
       expect(Number(balance)).toBe(i);
       Memory.info(`iteration ${i}`);
+      const amount = UInt64.from(1);
+      const signature = Signature.create(sender.key, [amount.value]);
 
       const tx = await Mina.transaction(
         { sender, fee: 100_000_000, memo: `step ${i + 1}` },
         async () => {
-          await balanceContract.topup();
+          await balanceContract.topup(amount, signature);
         }
       );
       await tx.prove();
