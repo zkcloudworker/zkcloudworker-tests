@@ -8,6 +8,7 @@ import {
   AccountUpdateForest,
   PublicKey,
   AccountUpdate,
+  Poseidon,
   UInt64,
   Bool,
   Field,
@@ -57,9 +58,32 @@ export const AddProgram = ZkProgram({
   },
 });
 
+export const AddProgramPoseidon = ZkProgram({
+  name: "AddProgramPoseidon",
+  publicOutput: Field,
+
+  methods: {
+    create: {
+      privateInputs: [AddValue],
+      async method(addValue: AddValue) {
+        addValue.value.assertLessThan(addValue.limit, "Value exceeds limit");
+        addValue.value.assertGreaterThan(
+          UInt32.from(0),
+          "Value must be positive"
+        );
+        const hash = Poseidon.hash([
+          addValue.limit.value,
+          addValue.value.value,
+        ]);
+        return { publicOutput: hash };
+      },
+    },
+  },
+});
+
 export class AddProgramProof extends ZkProgram.Proof(AddProgram) {}
 
-const ITERATIONS = 10;
+const ITERATIONS = 1;
 
 describe("Calculate", () => {
   it(`should calculate the Blake2b hash`, async () => {
@@ -92,9 +116,8 @@ describe("Calculate", () => {
     console.log("Max field                       :", maxField.toString());
     expect(max).toBeLessThan(maxField);
   });
-  0xaed570ac655ef0af669191f2f96a094309a05383d61fd739174167750ffe34a8;
-  0xaed570ac655ef0af669191f2f96a094309a05383d61fd739174167750ffe34a8;
-  it.skip(`should calculate the state`, async () => {
+
+  it(`should calculate the state`, async () => {
     const addValues = [];
     for (let i = 0; i < ITERATIONS * 40_000; i++) {
       addValues.push(
@@ -110,9 +133,17 @@ describe("Calculate", () => {
       await AddProgram.rawMethods.create(addValues[i]);
     }
     console.timeEnd("create");
+
     console.time("compile");
+    const methods = await AddProgram.analyzeMethods();
+    console.log(methods.create.summary());
+    const methodsPoseidon = await AddProgramPoseidon.analyzeMethods();
+    console.log(methodsPoseidon.create.summary());
     const cache = Cache.FileSystem("./cache");
     const vk = (await AddProgram.compile({ cache })).verificationKey;
+    const vkPoseidon = (await AddProgramPoseidon.compile({ cache }))
+      .verificationKey;
+
     console.timeEnd("compile");
     console.log(vk.hash.toJSON());
     console.time("create2");
