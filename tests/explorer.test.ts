@@ -7,6 +7,7 @@ type Command =
   | "agent" // AgentRequest
   | "agents" // null
   | "jobResult" // JobResultRequest
+  | "job" // JobRequest
   | "queryBilling"; // BalanceRequest
 
 interface BalanceRequest {
@@ -19,6 +20,11 @@ interface JobResultRequest {
   includeLogs: boolean;
 }
 
+interface JobRequest {
+  jobId: string;
+  includeLogs: boolean;
+}
+
 interface AgentRequest {
   developer: string;
   repo: string;
@@ -26,7 +32,7 @@ interface AgentRequest {
 
 interface ExplorerRequest {
   command: Command;
-  data: BalanceRequest | JobResultRequest | AgentRequest | null;
+  data: BalanceRequest | JobResultRequest | JobRequest | AgentRequest | null;
 }
 
 const id = "B62qqhL8xfHBpCUTk1Lco2Sq8HitFsDDNJraQG9qCtWwyvxcPADn4EV";
@@ -63,6 +69,13 @@ describe("Explorer", () => {
     });
     console.log("agents:", result);
   });
+  it(`should get the job result without id`, async () => {
+    const result = await fetchExplorerData({
+      command: "job",
+      data: { jobId, includeLogs: true },
+    });
+    console.log("job:", result);
+  });
   it(`should get the job result`, async () => {
     const result = await fetchExplorerData({
       command: "jobResult",
@@ -70,7 +83,7 @@ describe("Explorer", () => {
     });
     console.log("job result:", result);
   });
-  it.skipn(`should get the query billing`, async () => {
+  it.skip(`should get the query billing`, async () => {
     const result = await fetchExplorerData({
       command: "queryBilling",
       data: { id },

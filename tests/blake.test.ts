@@ -20,9 +20,13 @@ import {
   Bytes,
   UInt32,
   UInt8,
+  Hash,
 } from "o1js";
 
 const Bytes64 = Bytes(64);
+
+const a = Field(3);
+
 export class AddValue extends Struct({
   value: UInt32,
   limit: UInt32,
