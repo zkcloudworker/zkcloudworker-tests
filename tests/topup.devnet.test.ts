@@ -39,6 +39,7 @@ const keys: string[] = [
   "B62qjrWFfTuosipqFV2wrWCPWHo2UHk3sdcJAsvNj61eowfrXBq4X8F",
   "B62qpiTxGZAc2j82g8DMW2oS4zou3fcDb8meENk9jmjhvrwHDJFbczv",
   "B62qqqcQrWD18jitNAiF9WnJf7bcrmUabXShYTubKktuGSLyidUhY4U",
+  "5JvJyZs4nTAudcSRvoiYcDSyg5gcp628bPAvkPVMgVg2ay7cFumk"
 ];
 const addressesToTopup: string[] = [];
 

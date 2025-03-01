@@ -49,11 +49,11 @@ export const AddProgram = ZkProgram({
     create: {
       privateInputs: [AddValue],
       async method(addValue: AddValue) {
-        addValue.value.assertLessThan(addValue.limit, "Value exceeds limit");
-        addValue.value.assertGreaterThan(
-          UInt32.from(0),
-          "Value must be positive"
-        );
+        // addValue.value.assertLessThan(addValue.limit, "Value exceeds limit");
+        // addValue.value.assertGreaterThan(
+        //   UInt32.from(0),
+        //   "Value must be positive"
+        // );
         const bytes = addValue.toBytes();
         const hash = Gadgets.BLAKE2B.hash(bytes);
         return { publicOutput: hash };
@@ -113,6 +113,13 @@ describe("Calculate", () => {
     const hashBytes = hash.toBytes();
     console.log("length", hashBytes.length);
     console.log("hash:", "0x" + hash.toHex());
+
+    console.time("hash");
+    for (let i = 0; i < ITERATIONS * 40_000; i++) {
+      Gadgets.BLAKE2B.hash(bytes, 32);
+    }
+    console.timeEnd("hash");
+    console.time("create");
     const maxField = Field.ORDER;
     const maxBits = 256 - 2;
     const max = BigInt(2) ** BigInt(maxBits) - BigInt(1);
