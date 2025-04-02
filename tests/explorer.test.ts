@@ -5,6 +5,7 @@ type Command =
   | "balance" // BalanceRequest
   | "balances" // null
   | "agent" // AgentRequest
+  | "deployments" // AgentRequest
   | "agents" // null
   | "jobResult" // JobResultRequest
   | "job" // JobRequest
@@ -61,6 +62,14 @@ describe("Explorer", () => {
       data: { developer, repo },
     });
     console.log("agent:", result);
+  });
+
+  it(`should get the agent deployments`, async () => {
+    const result = await fetchExplorerData({
+      command: "deployments",
+      data: { developer, repo },
+    });
+    console.log("agent deployments:", result);
   });
   it(`should get the agents`, async () => {
     const result = await fetchExplorerData({
