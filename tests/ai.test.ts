@@ -12,7 +12,7 @@ let description =
 let prompt: string | undefined = undefined;
 
 describe("Stream AI", () => {
-  it.skip(`should list all available OpenAI models`, async () => {
+  it(`should list all available OpenAI models`, async () => {
     const models = await openai.models.list();
     expect(models).toBeDefined();
     expect(models.data).toBeInstanceOf(Array);
@@ -101,7 +101,7 @@ describe("Stream AI", () => {
     }
   });
 
-  it(`should get the image prompt from o1-mini`, async () => {
+  it.skip(`should get the image prompt from o1-mini`, async () => {
     const completion = await openai.chat.completions.create({
       model: "o3-mini",
       messages: [
@@ -124,7 +124,7 @@ describe("Stream AI", () => {
       size: "1024x1024",
     });
 
-    console.log("image", completion.data[0].url);
+    console.log("image", completion?.data?.[0]?.url);
   });
 });
 

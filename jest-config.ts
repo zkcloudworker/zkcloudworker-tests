@@ -5,7 +5,13 @@ const logCopy = console.log.bind(console);
 
 console.log = function () {
   // Timestamp to prepend
-  const timestamp = "[" + new Date().toLocaleTimeString() + "] ";
+  const now = new Date();
+  const timestamp =
+    "[" +
+    now.toLocaleTimeString("en-US", { hour12: false }) +
+    "." +
+    now.getMilliseconds().toString().padStart(3, "0") +
+    "] ";
 
   if (arguments.length) {
     // True array copy so we can call .splice()
@@ -28,5 +34,3 @@ console.log = function () {
     }
   }
 };
-
-

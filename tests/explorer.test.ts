@@ -39,7 +39,7 @@ interface ExplorerRequest {
 const id = "B62qqhL8xfHBpCUTk1Lco2Sq8HitFsDDNJraQG9qCtWwyvxcPADn4EV";
 const repo = "mint-worker";
 const developer = "DFST";
-const jobId = "zkCWI2VeyaHuqmPjYhThUv1tqfZwtrvEshPJAmGPBgRJf30FB";
+const jobId = "zkCWoswCTeFzH1hxVfOeVelAcOthzjZP1Q3YDXe2jHyKtdFs";
 
 describe("Explorer", () => {
   it(`should get the balance`, async () => {

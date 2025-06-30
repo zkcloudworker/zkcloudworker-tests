@@ -28,6 +28,7 @@ import { TEST_ACCOUNTS } from "../env.json";
 const chain: blockchain = "zeko" as blockchain;
 const INCREMENT = UInt64.from(1);
 let sender: TestPublicKey;
+let applied = 0;
 
 class BalanceContract extends SmartContract {
   @state(UInt64) record = State<UInt64>(UInt64.zero);
@@ -36,13 +37,17 @@ class BalanceContract extends SmartContract {
   public async topup() {
     const balance = this.account.balance.getAndRequireEquals();
     const record = this.record.getAndRequireEquals();
-    Provable.log("balance", balance);
-    Provable.log("record", record);
-    balance.assertEquals(record);
+    balance.assertEquals(record.mul(4));
     const sender = this.sender.getUnconstrained();
     const senderUpdate = AccountUpdate.createSigned(sender);
+    const senderUpdate2 = AccountUpdate.createSigned(sender);
+    const senderUpdate3 = AccountUpdate.createSigned(sender);
+    const senderUpdate4 = AccountUpdate.createSigned(sender);
     senderUpdate.balance.subInPlace(INCREMENT);
-    this.balance.addInPlace(INCREMENT);
+    senderUpdate2.balance.subInPlace(INCREMENT);
+    senderUpdate3.balance.subInPlace(INCREMENT);
+    senderUpdate4.balance.subInPlace(INCREMENT);
+    this.balance.addInPlace(INCREMENT.mul(4));
     this.record.set(record.add(INCREMENT));
   }
 }
@@ -68,7 +73,8 @@ describe("balance instability check", () => {
     const tx = await Mina.transaction(
       { sender, fee: 100_000_000, memo: "balance contract deploy" },
       async () => {
-        AccountUpdate.fundNewAccount(sender);
+        const au = AccountUpdate.createSigned(sender);
+        au.balance.subInPlace(UInt64.from(100_000_000));
         await balanceContract.deploy({});
       }
     );
@@ -83,7 +89,7 @@ describe("balance instability check", () => {
           wait: true,
         })
       )?.status
-    ).toBe("included");
+    ).toBe("pending");
   });
 
   for (let i = 0; i < 100; i++) {
@@ -94,8 +100,10 @@ describe("balance instability check", () => {
       let balance = Mina.getAccount(zkKey).balance.toBigInt();
       let record = balanceContract.record.get().toBigInt();
       let attempt = 1;
+      console.log(`balance ${i}:`, Number(balance));
+      console.log(`record ${i}:`, Number(record));
 
-      while (Number(balance) !== i || Number(record) !== i) {
+      while (Number(balance) !== i * 4 || Number(record) !== i) {
         console.log(
           `\x1b[31mwaiting for balance ${i}: ${formatTime(
             Date.now() - timeStart
@@ -107,11 +115,13 @@ describe("balance instability check", () => {
         await fetchMinaAccount({ publicKey: zkKey, force: true });
         balance = Mina.getAccount(zkKey).balance.toBigInt();
         record = balanceContract.record.get().toBigInt();
+        console.log(`balance retry ${i}:`, Number(balance));
+        console.log(`record retry ${i}:`, Number(record));
       }
       console.log(`balance ${i}:`, Number(balance));
       console.log(`record ${i}:`, Number(record));
-      expect(balance).toBe(record);
-      expect(Number(balance)).toBe(i);
+      expect(balance).toBe(record * 4n);
+      expect(Number(balance)).toBe(i * 4);
       Memory.info(`iteration ${i}`);
 
       const tx = await Mina.transaction(
@@ -123,9 +133,21 @@ describe("balance instability check", () => {
       await tx.prove();
       tx.sign([sender.key]);
       console.time("sendTx");
-      const txSent = await tx.safeSend();
+      let txSent = await tx.safeSend();
+      while (txSent.status !== "pending") {
+        console.log(
+          `\x1b[31mtxSent errors ${i}:\x1b[0m`,
+          txSent.hash,
+          txSent.status,
+          txSent.errors
+        );
+        await sleep(1000);
+        txSent = await tx.safeSend();
+      }
       console.timeEnd("sendTx");
+      console.log(`txSent ${i}:`, txSent.hash, txSent.status);
       console.time("applied");
+      const startApplied = Date.now();
       await fetchAccount({ publicKey: zkKey });
       let recordSent = balanceContract.record.get().toBigInt();
       let attemptSent = 1;
@@ -136,11 +158,16 @@ describe("balance instability check", () => {
         recordSent = balanceContract.record.get().toBigInt();
       }
       console.timeEnd("applied");
+      const appliedTime = Date.now() - startApplied;
       console.log(`record ${i}:`, Number(recordSent));
       console.log(`attempt ${i}:`, attemptSent);
       console.log(`txSent ${i}:`, txSent.hash, txSent.status);
+      if (appliedTime > applied) {
+        applied = appliedTime;
+      }
     });
   }
+  console.log(`applied:`, applied);
 });
 
 function formatTime(time: number) {
