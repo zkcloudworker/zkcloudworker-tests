@@ -15,11 +15,9 @@ describe("Stream AI", () => {
   it(`should list all available OpenAI models`, async () => {
     const models = await openai.models.list();
     expect(models).toBeDefined();
-    expect(models.data).toBeInstanceOf(Array);
-    console.log(
-      "Available models:",
-      models.data.map((model) => model.id)
-    );
+    expect(Array.isArray(models.data)).toBe(true);
+    const ids = models.data.map((model) => model.id);
+    console.log(`Available models (${ids.length}):\n${ids.join("\n")}`);
   });
   it.skip(`should get the stream answers`, async () => {
     const completion = await openai.chat.completions.create({

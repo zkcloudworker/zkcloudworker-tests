@@ -22,7 +22,7 @@
     "ts-jest": "^29.3.4",
     "typescript": "^5.8.3"
   },
-  "packageManager": "yarn@4.5.1",
+  "packageManager": "yarn@4.9.2",
   "dependencies": {
     "@minatokens/storage": "^0.16.16",
     "@prisma/client": "^6.8.2",
@@ -35,7 +35,7 @@
     "nanoid": "^5.1.5",
     "nats": "^2.29.3",
     "o1js": "2.5.0",
-    "openai": "^4.103.0",
+    "openai": "^6.42.0",
     "protobufjs": "^7.5.3",
     "puppeteer": "^24.9.0",
     "puppeteer-extra": "^3.3.6",

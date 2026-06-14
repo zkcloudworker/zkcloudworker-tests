@@ -54,8 +54,8 @@ const balanceContract = new BalanceContract(zkKey);
 
 describe("balance instability check", () => {
   it(`should compile`, async () => {
-    const url = "http://m1.zeko.io/graphql";
-    //const url = "https://devnet.zeko.io/graphql";
+    //const url = "http://m1.zeko.io/graphql";
+    const url = "https://devnet.zeko.io/graphql";
 
     const networkInstance = Mina.Network({
       mina: url,
@@ -76,7 +76,7 @@ describe("balance instability check", () => {
     console.log("sender balance", await accountBalanceMina(sender));
     console.log("contract", zkKey.toBase58());
     const tx = await Mina.transaction(
-      { sender, fee: 300_000_000, memo: "balance contract deploy" },
+      { sender, fee: 1_000_000_000, memo: "balance contract deploy" },
       async () => {
         const au = AccountUpdate.createSigned(sender);
         au.balance.subInPlace(UInt64.from(100_000_000));

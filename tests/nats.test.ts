@@ -31,7 +31,7 @@ describe("nats", () => {
     nc.drain();
     nc.close();
   });
-  it.skip(`should use kv`, async () => {
+  it(`should use kv`, async () => {
     const nc = await connect({ servers: endpoint });
     const js = nc.jetstream();
     const kv = await js.views.kv("profiles");
@@ -54,7 +54,7 @@ describe("nats", () => {
     let revision = 0;
     while (true) {
       const entry = await kv.get(
-        "zkcloudworker.job.zkCWZRGuAakatqUZlzuhNDxgKVHNoxeSLVzeAHZQVcExHpw0"
+        "zkcloudworker.job.zkCWZRGuAakatqUZlzuhNDxgKVHNoxeSLVzeAHZQVcExHpw0",
       );
       if (entry) {
         const job = JSON.parse(entry.string());
@@ -88,7 +88,7 @@ describe("nats", () => {
       const job = JSON.parse(e.string());
       console.log(
         `${history ? "History" : "Updated"} ${e.key} @ ${e.revision} -> `,
-        JSON.parse(e.string())
+        JSON.parse(e.string()),
       );
       let historyJob = true;
       const iterJob = await kv.watch({
@@ -101,7 +101,7 @@ describe("nats", () => {
         const jobStatus = JSON.parse(e.string());
         console.log(
           `${historyJob ? "History" : "Updated"} ${e.key} @ ${e.revision} -> `,
-          jobStatus
+          jobStatus,
         );
         if (jobStatus.status === "finished" || jobStatus.status === "failed")
           break;
@@ -111,7 +111,7 @@ describe("nats", () => {
     await nc.drain();
   });
 
-  it(`should watch multiple jobs status`, async () => {
+  it.skip(`should watch multiple jobs status`, async () => {
     const jobKeys = [
       "zkcloudworker.job.staketab.nameservice",
       "zkcloudworker.job.DFST.worker-example",
@@ -142,7 +142,7 @@ async function watchJobStatuses(endpoint: string, jobKeys: string[]) {
       const jobStatus = JSON.parse(e.string());
       console.log(
         `${historyJob ? "History" : "Updated"} ${e.key} @ ${e.revision} -> `,
-        jobStatus
+        jobStatus,
       );
       if (jobStatus.status === "finished" || jobStatus.status === "failed") {
         break;
@@ -164,7 +164,7 @@ async function watchJobStatuses(endpoint: string, jobKeys: string[]) {
       const job = JSON.parse(e.string());
       console.log(
         `${history ? "History" : "Updated"} ${e.key} @ ${e.revision} -> `,
-        job
+        job,
       );
 
       // Start watching the jobStatus of the current job
